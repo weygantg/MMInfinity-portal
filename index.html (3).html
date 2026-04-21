@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Motto Mortgage Infinity — Loan Portal</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:Arial,Helvetica,sans-serif;background:#f4f6fa;color:#282728;min-height:100vh}
+.app{display:flex;flex-direction:column;min-height:100vh}
+/* Header */
+.hdr{background:linear-gradient(135deg,#003057 0%,#003f72 100%);position:sticky;top:0;z-index:50;border-bottom:3px solid #FA7D00}
+.hdr-inner{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;max-width:600px;margin:0 auto;width:100%}
+.logo-btn{background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:0}
+.hdr-user{display:flex;align-items:center;gap:8px}
+.hdr-label{color:rgba(255,255,255,0.7);font-size:12px;font-weight:600}
+.logout-btn{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif}
+/* Main */
+.main{flex:1;max-width:600px;margin:0 auto;width:100%;padding-bottom:80px}
+/* Footer */
+footer{background:linear-gradient(135deg,#1a2332,#0d1520);padding:14px 16px;text-align:center}
+/* Cards */
+.card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:12px}
+/* Buttons */
+.btn{border:none;border-radius:12px;padding:14px 20px;font-size:15px;font-weight:800;cursor:pointer;width:100%;font-family:Arial,sans-serif;letter-spacing:0.02em}
+.btn-orange{background:linear-gradient(135deg,#FA7D00,#e06000);color:#fff;box-shadow:0 4px 16px rgba(250,125,0,0.35)}
+.btn-navy{background:linear-gradient(135deg,#003057,#00488a);color:#fff}
+.btn-green{background:linear-gradient(135deg,#64C887,#38c46e);color:#fff}
+/* Forms */
+.lbl{display:block;font-size:12px;font-weight:700;color:#666;letter-spacing:0.08em;text-transform:uppercase;margin:12px 0 5px}
+.inp{width:100%;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 14px;font-size:14px;font-family:Arial,sans-serif;color:#282728;outline:none;transition:border-color 0.15s}
+.inp:focus{border-color:#FA7D00}
+select.inp{cursor:pointer}
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;backdrop-filter:blur(3px)}
+.modal-box{background:#fff;border-radius:20px;padding:24px 20px;max-width:360px;width:100%;max-height:80vh;overflow-y:auto}
+/* Borrower nav */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e8ecf2;display:flex;z-index:100;max-width:600px;margin:0 auto;box-shadow:0 -4px 20px rgba(0,0,0,0.08)}
+.bnav-btn{flex:1;border:none;background:none;padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font-size:10px;font-weight:600;color:#9aa3b0;font-family:Arial,sans-serif;transition:color 0.15s}
+.bnav-btn.active{color:#FA7D00}
+/* Progress */
+.progress-bar{background:#e8ecf2;border-radius:6px;height:8px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,#FA7D00,#e06000);height:100%;border-radius:6px;transition:width 0.5s ease}
+/* Conditions */
+.pending-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:#fff7f0;border-radius:10px;font-size:13px;margin-bottom:8px;line-height:1.4}
+.cond-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0f0f0;font-size:14px}
+.cond-row:last-child{border-bottom:none}
+/* Staff */
+.sec-tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.sec-tab{border:1.5px solid #e2e8f0;background:#fff;border-radius:10px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:Arial,sans-serif;color:#666}
+.sec-tab.active{background:#003057;color:#fff;border-color:#003057}
+.loan-card{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);cursor:pointer;border:1.5px solid transparent;transition:border-color 0.15s}
+.loan-card:hover{border-color:#FA7D00}
+/* Urgent alert animation */
+@keyframes urgentGlow{0%,100%{box-shadow:0 4px 24px rgba(200,0,0,0.35)}50%{box-shadow:0 6px 48px rgba(220,0,0,0.65),0 0 80px rgba(220,0,0,0.2)}}
+.urgent-alert{animation:urgentGlow 3s ease-in-out infinite;background:#fff}
+/* FAQ */
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:13px 0;cursor:pointer;font-size:14px;font-weight:700;color:#003057;border-bottom:1px solid #f0f0f0;gap:10px}
+.faq-ans{display:none;padding:10px 0 14px;font-size:13px;line-height:1.75;color:#555}
+.faq-ans.show{display:block}
+/* Road CSS */
+.road-strip{position:absolute;left:50%;transform:translateX(-50%);width:44px;top:0;bottom:0;background:linear-gradient(to bottom,#d4c8b8,#c8baa8);border-radius:6px;z-index:0}
+.step-row{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;margin-bottom:4px}
+.step-inner{display:flex;align-items:center;width:100%;min-height:82px}
+.step-inner.left{flex-direction:row}
+.step-inner.right{flex-direction:row-reverse}
+.step-circle-wrap-left{width:50%;display:flex;justify-content:flex-end;padding-right:27px}
+.step-circle-wrap-right{width:50%;display:flex;justify-content:flex-start;padding-left:27px}
+.step-circle{border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;position:relative;transition:transform 0.15s;font-family:Arial,sans-serif}
+.step-circle.done{background:linear-gradient(135deg,#64C887,#38c46e);border:3px solid #38a060;box-shadow:0 3px 12px rgba(100,200,135,0.4);color:#fff}
+.step-circle.current{background:linear-gradient(135deg,#003057,#00488a);border:4px solid #FA7D00;box-shadow:0 0 0 8px rgba(250,125,0,0.15),0 5px 20px rgba(0,48,87,0.35);color:#fff}
+.step-circle.future{background:#e8ecf2;border:2.5px solid #d0d6e0;color:#9aa3b0}
+.here-tag{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#FA7D00,#e06000);color:#fff;font-size:7px;font-weight:900;border-radius:8px;padding:2px 6px;white-space:nowrap;letter-spacing:0.05em;box-shadow:0 2px 8px rgba(250,125,0,0.4)}
+.step-label-left{width:50%;padding-left:12px;padding-right:24px}
+.step-label-right{width:50%;padding-right:12px;padding-left:24px;text-align:right}
+.step-detail{display:none;background:#f8fafc;border-radius:12px;padding:14px;margin:6px 16px 10px;font-size:14px;line-height:1.75;color:#444}
+.step-detail.show{display:block}
+.step-detail.done-detail{background:#f0faf4}
+.link-btn{background:transparent;border:none;color:#FA7D00;font-size:12px;font-weight:700;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;font-family:Arial,sans-serif}
+textarea.inp{min-height:80px;resize:vertical}
+</style>
+</head>
+<body>
+<div class="app">
+  <div id="hdr"></div>
+  <!-- Static landing portal buttons -->
+  <div id="static-land" style="background:#0c1a2e;min-height:calc(100vh - 66px);padding:0 0 20px">
+    <div style="padding:18px 20px 12px">
+      <div style="color:rgba(255,255,255,0.4);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:5px">Select Your Portal</div>
+      <div style="color:#fff;font-weight:900;font-size:24px;line-height:1.2">Good to see you.<br><span style="color:#FA7D00">Where</span> are you headed?</div>
+    </div>
+    <div style="padding:6px 16px">
+      <button id="go-borrower" style="width:100%;background:linear-gradient(135deg,#FA7D00,#e06000);border:none;border-radius:22px;padding:22px 20px;margin-bottom:14px;cursor:pointer;text-align:left;box-shadow:0 10px 36px rgba(250,125,0,0.4);display:block;font-family:Arial,sans-serif;position:relative;overflow:hidden">
+        <!-- decorative background house -->
+        <svg style="position:absolute;right:-10px;top:-10px;opacity:0.12" width="120" height="120" viewBox="0 0 24 24" fill="white"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <div style="color:#003057;font-size:10px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:10px">Borrower Portal</div>
+        <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:8px">
+          <div style="background:rgba(255,255,255,0.2);border-radius:16px;padding:12px;flex-shrink:0">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+          </div>
+          <div>
+            <div style="color:#003057;font-weight:900;font-size:26px;line-height:1.2;margin-bottom:6px">Track Your<br><span style="color:#003057">Loan Journey</span></div>
+            <div style="color:rgba(255,255,255,0.8);font-size:13px">Roadmap, documents &amp; real-time status.</div>
+          </div>
+        </div>
+        <div style="background:#fff;color:#e06000;border-radius:10px;padding:13px 18px;display:flex;align-items:center;justify-content:space-between;font-weight:900;font-size:15px;margin-top:14px"><span>Sign In to Borrower Portal</span><span>&#8250;</span></div>
+      </button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <button id="go-realtor" style="background:linear-gradient(160deg,#64C887,#38c46e);border:none;border-radius:18px;padding:18px 16px;cursor:pointer;text-align:left;box-shadow:0 6px 24px rgba(100,200,135,0.4);font-family:Arial,sans-serif;min-height:180px;position:relative;overflow:hidden">
+          <svg style="position:absolute;right:-8px;bottom:-8px;opacity:0.12" width="90" height="90" viewBox="0 0 24 24" fill="white"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          <div style="background:rgba(255,255,255,0.2);border-radius:12px;padding:10px;display:inline-block;margin-bottom:10px">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          </div>
+          <div style="color:#003057;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:6px">Partner Portal</div>
+          <div style="color:#003057;font-weight:900;font-size:20px;line-height:1.2;margin-bottom:6px">Realtor<br><span style="color:#003057">Access</span></div>
+          <div style="color:rgba(255,255,255,0.8);font-size:12px;margin-bottom:12px">Client file status</div>
+          <div style="color:#fff;font-weight:800;font-size:13px">Sign In &#8250;</div>
+        </button>
+        <button id="go-staff" style="background:linear-gradient(160deg,#007DC3,#0096e6);border:none;border-radius:18px;padding:18px 16px;cursor:pointer;text-align:left;box-shadow:0 6px 24px rgba(0,125,195,0.35);font-family:Arial,sans-serif;min-height:180px;position:relative;overflow:hidden">
+          <svg style="position:absolute;right:-8px;bottom:-8px;opacity:0.12" width="90" height="90" viewBox="0 0 24 24" fill="white"><path d="M20 6h-2.18c.07-.44.18-.88.18-1.36C18 2.06 15.96 0 13.36 0c-1.3 0-2.48.52-3.36 1.36L9 2.36 7.99 1.36C7.12.52 5.93 0 4.64 0 2.04 0 0 2.06 0 4.64c0 .48.11.92.18 1.36H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm-6.64-4c1.3 0 2.36 1.06 2.36 2.36 0 1.3-1.06 2.36-2.36 2.36-1.3 0-2.36-1.06-2.36-2.36C11 3.06 12.06 2 13.36 2zM4.64 2C5.94 2 7 3.06 7 4.36 7 5.66 5.94 6.72 4.64 6.72 3.34 6.72 2.28 5.66 2.28 4.36 2.28 3.06 3.34 2 4.64 2zM20 20H2V8h18v12z"/></svg>
+          <div style="background:rgba(255,255,255,0.2);border-radius:12px;padding:10px;display:inline-block;margin-bottom:10px">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/><path d="M0 0h24v24H0z" fill="none"/><path d="M9 16h2V8H9v8zm4-8v8h2V8h-2z" fill="white"/><rect x="9" y="8" width="2" height="8" fill="white"/><rect x="13" y="8" width="2" height="8" fill="white"/><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 8h2v-2H7v2zm0-4h2v-2H7v2zm0-4h2V7H7v2zm4 8h2v-2h-2v2zm0-4h2v-2h-2v2zm0-4h2V7h-2v2zm4 8h2v-2h-2v2zm0-4h2v-2h-2v2zm0-4h2V7h-2v2z" fill="none"/><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3z" fill="white"/></svg>
+          </div>
+          <div style="color:#003057;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:6px">Staff Portal</div>
+          <div style="color:#003057;font-weight:900;font-size:20px;line-height:1.2;margin-bottom:6px">LO &amp;<br><span style="color:#003057">Admin</span></div>
+          <div style="color:rgba(255,255,255,0.8);font-size:12px;margin-bottom:12px">Manage loan files</div>
+          <div style="color:#fff;font-weight:800;font-size:13px">Sign In &#8250;</div>
+        </button>
+      </div>
+      <button id="go-contact" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:13px 18px;color:rgba(255,255,255,0.55);font-weight:600;font-size:14px;cursor:pointer;font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;gap:10px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Our Offices &amp; Team
+      </button>
+    </div>
+  </div>
+  <div id="main" class="main" style="display:none;padding:0"></div>
+  <div id="ftr"></div>
+  <div id="modal" style="display:none"></div>
+</div>
+<script>
+'use strict';
+
+// ── Brand Colors ────────────────────────────────────────────────────────────
+const C={blue:"#003057",slate:"#A4BCC2",charcoal:"#282728",ocean:"#007DC3",mint:"#64C887",orange:"#FA7D00",silver:"#CACCCE",gray:"#838587"};
+
+// ── Offices ──────────────────────────────────────────────────────────────────
+const OFFICES=[
+  {id:"ftm",name:"Fort Myers",nmls:"1865732",address:"4048 Evans Avenue, Suite 303",city:"Fort Myers, FL 33901",phone:"(239) 432-9030"},
+  {id:"nap",name:"Naples",    nmls:"1929732",address:"300 Fifth Ave South, Suite 227",city:"Naples, FL 34102",    phone:"(239) 432-9030"},
+];
+
+// ── Staff logins ─────────────────────────────────────────────────────────────
+const STAFF=[
+  {id:"gweygant",u:"gweygant",p:"infinity25", name:"Glenda Weygant",role:"admin",nmls:""},
+  {id:"twayland",u:"twayland",p:"motto2025",  name:"Terry Wayland", role:"admin",nmls:"TBD"},
+  {id:"triley",  u:"triley",  p:"triley25",   name:"Travis Riley",  role:"lo",   nmls:"1048207"},
+  {id:"abravo",  u:"abravo",  p:"abravo25",   name:"Andy Bravo",    role:"lo",   nmls:"1869785"},
+  {id:"lzimmer", u:"lzimmer", p:"lzimmer25",  name:"Laurie Zimmer", role:"lo",   nmls:"2221205"},
+  {id:"azimmer", u:"azimmer", p:"azimmer25",  name:"Alex Zimmer",   role:"lo",   nmls:"2774570"},
+];
+
+// ── Loan Officers (with photos) ───────────────────────────────────────────────
+const LOS=[
+  {name:"Terry Wayland", title:"Owner / Mortgage Loan Originator",nmls:"TBD",   phone:"",          email:"",                               photo:""},
+  {name:"Travis Riley",  title:"Mortgage Loan Originator",        nmls:"1048207",phone:"(239) 822-2748",email:"Travis.Riley@mottomortgage.com", photo:"https://assets.mottocenter.com/https:/1622576344_travis%20riley.jpg"},
+  {name:"Corey Wayland", title:"Mortgage Loan Originator",        nmls:"1978468",phone:"(239) 610-1080",email:"Corey.Wayland@mottomortgage.com",photo:"https://assets.mottocenter.com/https:/1622576266_corey%20wayland.jpg"},
+  {name:"Andy Bravo",    title:"Mortgage Loan Originator",        nmls:"1869785",phone:"(239) 603-8589",email:"Andy.Bravo@mottomortgage.com",   photo:"https://assets.mottocenter.com/media/user_photos/1738257895_1001859_profile_photo"},
+  {name:"Laurie Zimmer", title:"Loan Officer",                    nmls:"2221205",phone:"(239) 722-4555",email:"l.zimmer@mottomortgage.com",     photo:"https://assets.mottocenter.com/media/user_photos/1724987628_1004917_profile_photo"},
+  {name:"Alex Zimmer",   title:"Processing Assistant & MLO",      nmls:"2774570",phone:"(239) 269-7676",email:"alex.zimmer@mottomortgage.com",  photo:"https://assets.mottocenter.com/media/user_photos/1773762280_1005266_profile_photo"},
+];
+
+// ── Emoji Themes (16 milestones) ─────────────────────────────────────────────
+const EMOJI_THEMES=[
+  {id:"classic",  emoji:["📋","📤","✅","📐","💳","📊","🔎","📜","🛡️","🔐","🗂️","📬","✍️","🎯","📅","🏠"]},
+  {id:"florida",  emoji:["🌴","🌊","✅","🏖️","💳","🦩","🔍","📜","☀️","🔐","🌺","📬","✍️","🎯","📅","🏡"]},
+  {id:"celebrate",emoji:["🎊","🚀","⭐","📐","💳","📈","🌟","🎁","🛡️","🔐","🗂️","📬","✍️","🏆","🗓️","🎉"]},
+  {id:"journey",  emoji:["🗺️","✉️","🌟","📐","💳","📊","🔎","📋","🛡️","🔐","🗂️","📬","✍️","🎯","📅","🗝️"]},
+];
+
+// ── 16 Milestones ─────────────────────────────────────────────────────────────
+const MS=[
+  {id:"app_received", s:"Application",         e:"📋",msg:"Your application has been received. We are excited to work with you!",sms:"Your application has been received. We will reach out shortly with your document checklist.",detail:"We have your application! Our team is reviewing your information. Expect a call or email soon with a list of documents we need. No action needed yet."},
+  {id:"submitted",    s:"Submitted",            e:"📤",msg:"Submitted to the Lender for Initial Approval.",sms:"Your loan file has been submitted to the lender for underwriting review. We will keep you posted.",detail:"Your complete loan package has been submitted to the lender's underwriting team. They will review your income, credit, and property details. This typically takes a few business days. Respond quickly to any requests."},
+  {id:"approval",     s:"Conditional Approval", e:"✅",msg:"Congratulations! You have received a Conditional Approval.",sms:"Your loan has received a Conditional Approval! We are working on clearing the remaining conditions.",detail:"The lender has approved your loan — with conditions to clear first. This is completely normal. Most loans receive conditional approvals. We will work through each condition quickly. It is IMPERATIVE you respond quickly to every document request."},
+  {id:"appr_ordered", s:"Appraisal Ordered",    e:"📐",msg:"Your property appraisal has been ordered. The appraiser will contact you to schedule.",sms:"Your property appraisal has been ordered! The appraiser will contact you within a few days to schedule.",detail:"A licensed, independent appraiser has been ordered to visit the property. They confirm the home's market value. By law, lenders must order appraisers from a third-party company — you cannot choose the appraiser."},
+  {id:"appr_paid",    s:"Appraisal Paid",       e:"💳",msg:"The appraisal fee has been paid. The appraiser will schedule their visit shortly.",sms:"The appraisal fee has been paid! The appraiser will now schedule their visit to the property.",detail:"The appraisal fee has been collected and the appraiser is scheduling their property visit. This fee is part of your closing costs and is typically paid upfront before the appraisal is conducted."},
+  {id:"appr_received",s:"Appraisal Received",   e:"📊",msg:"The appraisal has been received. Your home value has been confirmed!",sms:"The appraisal is back! Your home value has been confirmed. Things are moving along nicely.",detail:"The appraisal report is in and has been reviewed. The property value supports your loan amount — great news! This is a major milestone in your loan process."},
+  {id:"title_ordered",s:"Title Ordered",        e:"🔎",msg:"A title search has been ordered on your property.",sms:"A title search has been ordered on the property to confirm clear ownership. No action needed from you.",detail:"A title company is searching public records to confirm the seller has clear ownership and there are no outstanding liens, judgments, or legal issues. Think of it as a background check on the home's ownership history."},
+  {id:"title_received",s:"Title Received",      e:"📜",msg:"Title has been received and reviewed. The property has a clean history!",sms:"Title has come back clean! The property has a clear ownership history and is ready to transfer at closing.",detail:"The title search is complete and clear. There are no ownership issues or surprises. The home is ready to be legally transferred to you at closing. Title insurance will be issued to protect you."},
+  {id:"ins_quoted",   s:"Insurance Quoted",     e:"🛡️",msg:"Your homeowners insurance quote has been received. Please review and confirm your selection.",sms:"Your homeowners insurance quote is in! Please review your coverage options and confirm your selection.",detail:"Your insurance agent has provided a homeowners insurance quote. Review the coverage carefully — you need at minimum dwelling coverage equal to your loan amount. If the property is in a flood zone, flood insurance is also required."},
+  {id:"ins_bound",    s:"Insurance Bound",      e:"🔐",msg:"Your homeowners insurance has been bound and confirmed. You are protected!",sms:"Your homeowners insurance is bound and confirmed on file with the lender. You are protected!",detail:"Your homeowners insurance policy has been bound and the lender has a copy on file. This is required before closing. If your property is in a flood zone, your flood insurance has also been confirmed."},
+  {id:"clearing",     s:"Conditions Clearing",  e:"🗂️",msg:"We are reviewing your final documents. Almost there — respond quickly to any requests!",sms:"We are clearing the final conditions. Please respond quickly to any document requests.",detail:"The underwriter is reviewing your final documents and clearing remaining conditions. You are in the home stretch! Please respond to any final document requests as quickly as possible. PDFs only — no screenshots."},
+  {id:"cd_sent",      s:"CD Sent",              e:"📬",msg:"Your Closing Disclosure has been sent. Review it carefully — you have 3 business days.",sms:"Your Closing Disclosure has been sent! Please review it carefully and compare it to your Loan Estimate.",detail:"Your Closing Disclosure is the final, detailed breakdown of every cost. Federal law requires you receive it at least 3 business days before closing. Review it carefully and call us immediately with any questions."},
+  {id:"cd_signed",    s:"CD Signed",            e:"✍️",msg:"Your Closing Disclosure has been signed. You are almost at the finish line!",sms:"Your Closing Disclosure has been signed! We are preparing your final loan documents. Closing is right around the corner!",detail:"You have reviewed and signed your Closing Disclosure — a major final step! Your loan documents are now being prepared for closing. Bring your government-issued photo ID and be ready to wire your closing funds."},
+  {id:"ctc",          s:"Clear to Close!",      e:"🏆",msg:"CONGRATULATIONS! You are CLEAR TO CLOSE! Every condition has been satisfied!",sms:"CONGRATULATIONS! Your loan is officially CLEAR TO CLOSE! I will be reaching out shortly to schedule your closing. You did it!",detail:"THIS IS IT — every single condition has been satisfied and your loan is FULLY APPROVED! Your closing date is set and your loan documents are ready. Bring your ID and certified funds. You are about to be a homeowner!"},
+  {id:"closing_sched",s:"Closing Scheduled",    e:"🗓️",msg:"Your closing date and time are confirmed. Get ready for your keys!",sms:"Your closing is scheduled! Remember to bring your government-issued photo ID. Closing funds must be by wire or cashier check.",detail:"Your closing date, time, and location are confirmed! Bring your government-issued photo ID. Your down payment and closing costs MUST be paid by wire transfer or cashier check — personal checks are not accepted."},
+  {id:"closed",       s:"Closed!",              e:"🎉",msg:"CONGRATULATIONS! You are officially a HOMEOWNER! Welcome home!",sms:"CONGRATULATIONS! You are officially a HOMEOWNER! It was an honor working with you. Remember to apply for your Florida Homestead Exemption by March 1st!",detail:"CONGRATULATIONS — YOU ARE A HOMEOWNER! The keys are yours. Do not forget to apply for your Florida Homestead Exemption by March 1st of next year to save on property taxes. It was our honor to help you achieve the American Dream!"},
+];
+
+const CTC_IDS=["cd_signed","ctc","closing_sched","closed"];
+
+// ── Standard Conditions ───────────────────────────────────────────────────────
+const BSTD=[
+  {id:"b1", l:"Driver's License (PDF, not screenshot)"},
+  {id:"b2", l:"Social Security Card"},
+  {id:"b3", l:"W-2s — last 2 years, ALL pages"},
+  {id:"b4", l:"Pay Stubs — covering one full month"},
+  {id:"b5", l:"Bank Statements — last 2 months, ALL pages, ALL accounts"},
+  {id:"b6", l:"Federal Tax Returns — last 2 years, ALL pages, ALL schedules"},
+  {id:"b7", l:"Homeowners/Flood Insurance Quote (once under contract)"},
+  {id:"b8", l:"Signed Initial Disclosures"},
+  {id:"b9", l:"Signed Closing Disclosure"},
+  {id:"b10",l:"Proof of Funds to Close"},
+  {id:"b11",l:"Gift Letter + Donor Bank Statement (if applicable)"},
+  {id:"b12",l:"Letter of Explanation — Credit Inquiries (if needed)"},
+  {id:"b13",l:"Business License, Business Returns, P&L (self-employed only)"},
+];
+const RSTD=[
+  {id:"r1",l:"Fully Executed Purchase Contract"},
+  {id:"r2",l:"All Contract Addendums Signed"},
+  {id:"r3",l:"Home Inspection Completed"},
+  {id:"r4",l:"Inspection Repair Addendum (if applicable)"},
+  {id:"r5",l:"Survey Ordered"},
+  {id:"r6",l:"Final Walkthrough Scheduled"},
+  {id:"r7",l:"HOA Documents Provided (if applicable)"},
+  {id:"r8",l:"Condo Questionnaire (if applicable)"},
+  {id:"r9",l:"Preliminary Closing Statement Reviewed"},
+];
+
+// ── State ─────────────────────────────────────────────────────────────────────
+const ST={view:"landing",loans:[],session:null,editLoan:null,staffView:"dash",smsPrompt:null,bTab:"home",realtorSelId:null,editTab:"info"};
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}
+function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function mIdx(id){const i=MS.findIndex(m=>m.id===id);return i<0?0:i;}
+function findMs(id){return MS.find(m=>m.id===id)||MS[0];}
+function findLO(nmls){return LOS.find(l=>l.nmls===nmls)||null;}
+function findOffice(id){return OFFICES.find(o=>o.id===id)||OFFICES[0];}
+function getThemeEmoji(loan,i){const t=EMOJI_THEMES.find(t=>t.id===(loan.loanTheme||"celebrate"));return t?t.emoji[Math.min(i,t.emoji.length-1)]:"⭐";}
+function initConds(arr){const o={};arr.forEach(c=>o[c.id]=false);return o;}
+function makeLoan(loNmls){
+  return{id:genId(),lastName:"",address:"",closingDate:"",officeId:"ftm",loNmls:loNmls||"",loPhone:"",processor:"",
+    borrowerPhone:"",borrowerEmail:"",mlsNumber:"",homePhotoUrl:"",
+    listingAgentName:"",listingAgentPhone:"",buyerAgentName:"",buyerAgentPhone:"",
+    milestone:"app_received",bConds:initConds(BSTD),rConds:initConds(RSTD),
+    custB:[],custR:[],bNote:"",rNote:"",notes:"",
+    borrowerUser:"",borrowerPass:"",realtorUser:"",realtorPass:"",
+    loanTheme:"celebrate",createdAt:new Date().toISOString()};
+}
+function saveLoans(){try{localStorage.setItem("mmi_loans",JSON.stringify(ST.loans));}catch(e){}}
+function loadLoans(){
+  try{const s=localStorage.getItem("mmi_loans");if(s){ST.loans=JSON.parse(s);}}catch(e){}
+  // Seed demo loan if not already present
+  var SEED_ID="demo-amos-138";
+  if(!ST.loans.find(function(l){return l.id===SEED_ID;})){
+    ST.loans.unshift({
+      id:SEED_ID,
+      lastName:"Amos",
+      address:"138 Burnt Pine Dr",
+      closingDate:"",
+      officeId:"ftm",
+      loNmls:"2221205",
+      borrowerPhone:"",
+      borrowerEmail:"",
+      mlsNumber:"2026014096",
+      homePhotoUrl:"",
+      listingAgentName:"",
+      listingAgentPhone:"",
+      buyerAgentName:"",
+      buyerAgentPhone:"",
+      milestone:"approval",
+      bConds:{},
+      rConds:{},
+      custB:[],
+      custR:[],
+      bNote:"Welcome to your loan portal! Your loan has received a Conditional Approval. We are working through the remaining conditions and will keep you updated every step of the way.",
+      rNote:"This file is in Conditional Approval. Conditions are being cleared. Please keep an eye on the checklist.",
+      notes:"Demo file for internal testing.",
+      borrowerUser:"amos138",
+      borrowerPass:"MMI2026",
+      realtorUser:"amos138",
+      realtorPass:"MMI2026",
+      loanTheme:"celebrate"
+    });
+    saveLoans();
+  }
+}
+
+// ── Logo ──────────────────────────────────────────────────────────────────────
+const LOGO_B64="data:image/png;base64,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7anPnl60af/xZaUJJoLaZABhkyeJO6yzcJSCbWZNgagLd/ezcy/6010vPPXO/aseO/P347OemWk7VCI2iiWg0kDE+SaUpQIQmbRRQmLvOwYgLKKp0sLn8zcgN0e9uXZ96fE3/OGJyx6+75rFWXNcKecQSxwIWwVskckoeX4T5+/a0VgWgKoyX4rwVCjGrYt6omVbHwDMuOHKvIvufv1+Q3Iv3b23kriQ2UVQusxknaI8NuIWoKrFH367sXj12tqpD34tTX781Q0vXnvB6JVd9y7glUXbTli+esfgRNQGFBNI2Khtiio9xPxrew3M/QY8qayr5br7Xzvygc/evX1X2dapdRW6hAhBXZ0OaA47Muq6bCksLmlNifKBu/SK6wvKQmf8ln780ZNPLrvl6qsn1WZbl0X2am5UHwxXEmGCZWSIKqD7/UYAEioXX+DvXVHhRiXYNLvLLARErJTuGvHrrilA0PZpi1Gm2yZZgKq0oGmXodsmZ+LdFF7heEHmisBIxyc16TxtMA8vp/ABC8lL3QGuLWYDWiZeSNf789qWxPv1Ajne06QLOeiWTZACxwVx07gxxASWrdt91E9zS2e2BFlF950XjVX+1jLd5txQ2uER/exrXi35eMeGZz5bvu34sro4fzcCO+onUDb7lv26bRKcAMWusoaRL3794133LJtz463Xfpq1OCIdSkBzbTel98f9xs+t927gsHej2GhIGPhm25bRi3dteOmFV94+mFKa3RS8t0upYqb8FiKXV2zB74jEvhoo2ABLbCCguCjKntbX5r43va6cvLejqeqynRWVxFXllM5kMia4FmKIvXdblLCtpkwqr6q7flXZql933bGAn5YvKgga8asSjhNCwE7VD4JG2jCzou/+2d1Rz8zf/eXIDxf8+PyaXesOqYsbEiJgtoV9Gp5JvT8XIASORlBV11j80aK1Vy3Y+tm4DlVIARJ23WRMKi34TYsxLQLhIECyu4lTSGnitaD351rpumuUslSY1jTt/HgdKb094rC/8fAW2LniODjeV79DU5p01OKXk/vq1334GOVt82nqZWqLefXHPLynm+bhMzT50jTpbKCuGzpA4rBnZ3ATK00o1Gr4z7sffXmA/8/v/8+7Q17+dMMVe6prQoz/DG4qOtb/zf1o6cC6sjXP7NlXdnwiFuNajowbTRGomHAqBw8eWNkzklOZ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";
+
+function buildMottoLogo(){
+  return '<div style="background:#fff;border-radius:8px;padding:4px 10px"><img src="'+LOGO_B64+'" style="height:28px;width:auto;display:block" alt="Motto Mortgage"/></div>';
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+function buildHeader(){
+  let label="";
+  if(ST.session){
+    if(ST.session.type==="staff") label=esc(ST.session.staffUser.name)+(ST.session.staffUser.role==="admin"?" (Admin)":" (LO)");
+    else if(ST.session.type==="borrower") label="Borrower Portal";
+    else if(ST.session.type==="realtor") label="Realtor Portal";
+  }
+  const userHtml=label?'<div class="hdr-user"><div class="hdr-label">'+label+'</div><button class="logout-btn" data-a="lgOut">Logout</button></div>':"";
+  return '<div class="hdr"><div class="hdr-inner"><button class="logo-btn" data-a="lgOut">'+buildMottoLogo()+'<div style="border-left:1px solid rgba(255,255,255,0.18);padding-left:10px"><div style="color:#fff;font-weight:900;font-size:15px;letter-spacing:0.22em">INFINITY</div></div></button>'+userHtml+'</div></div>';
+}
+
+// ── Footer ─────────────────────────────────────────────────────────────────────
+function buildFooter(){
+  return '<footer><div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px"><svg width="32" height="32" viewBox="0 0 24 24" fill="white" opacity="0.8"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><div style="color:rgba(255,255,255,0.5);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em">Equal<br>Housing<br>Opportunity</div></div><div style="color:rgba(255,255,255,0.6);font-size:11px;margin-bottom:4px">Fort Myers NMLS# 1865732 &nbsp;|&nbsp; Naples NMLS# 1929732</div><div style="color:rgba(255,255,255,0.35);font-size:10px">Each Office is Independently Owned, Operated, and Licensed.<br>Motto Franchising, LLC is an Equal Opportunity Employer and supports the Fair Housing Act.<br>&copy;2025 Motto Franchising, LLC. All rights reserved.</div></footer>';
+}
+
+// ── Login Screen ───────────────────────────────────────────────────────────────
+function buildLogin(type){
+  const info={
+    borrower:{t:"Borrower Portal",s:"Sign in to track your loan on our roadmap",c:"linear-gradient(135deg,#FA7D00,#e06000)"},
+    realtor: {t:"Realtor Portal", s:"Sign in to view your client files",          c:"linear-gradient(135deg,#64C887,#38c46e)"},
+    staff:   {t:"Staff Portal",   s:"LO and Admin access",                         c:"linear-gradient(135deg,#007DC3,#0096e6)"},
+  }[type];
+  if(!info) return "";
+  return '<div style="padding:20px 16px"><div style="background:'+info.c+';border-radius:18px;padding:24px 20px;text-align:center;margin-bottom:20px"><div style="color:#fff;font-weight:900;font-size:22px;margin-bottom:4px">'+info.t+'</div><div style="color:rgba(255,255,255,0.8);font-size:13px">'+info.s+'</div></div>'
+    +'<div class="card"><button data-a="goBack" style="background:none;border:none;color:#666;font-size:13px;cursor:pointer;font-family:Arial,sans-serif;margin-bottom:14px;padding:0">&lsaquo; Back</button>'
+    +'<label class="lbl">Username</label><input class="inp" id="li_u" type="text" placeholder="Enter username" autocomplete="username">'
+    +'<label class="lbl">Password</label><input class="inp" id="li_p" type="password" placeholder="Enter password" autocomplete="current-password">'
+    +'<div id="li_err" style="color:#cc0000;font-size:13px;font-weight:700;margin:10px 0;display:none">&#9888; Username or password not found.</div>'
+    +'<button class="btn btn-orange" style="margin-top:14px" data-a="doLogin" data-t="'+type+'">Sign In &rarr;</button></div></div>';
+}
+
+// ── Borrower Home Screen ───────────────────────────────────────────────────────
+function buildBorrowerHome(loan){
+  const mi=mIdx(loan.milestone);
+  const cur=findMs(loan.milestone);
+  const prog=Math.round((mi/(MS.length-1))*100);
+  const pendingCnt=BSTD.filter(c=>!(loan.bConds&&loan.bConds[c.id])).length+(loan.custB||[]).filter(c=>!c.checked).length;
+  const lo=findLO(loan.loNmls);
+  const isCtc=CTC_IDS.includes(loan.milestone);
+  const isClosed=loan.milestone==="closed";
+  const stepEmoji=getThemeEmoji(loan,mi);
+  const statusColor=isClosed?"#64C887":isCtc?"#FA7D00":"#A4BCC2";
+
+  let daysHtml="";
+  if(loan.closingDate){
+    const d=Math.round((new Date(loan.closingDate)-new Date())/(864e5));
+    if(d>0) daysHtml='<div style="flex-shrink:0;background:#fff;border-radius:14px;padding:12px 14px;min-width:96px;box-shadow:0 2px 12px rgba(0,0,0,0.07);text-align:center"><div style="font-size:22px;font-weight:900;color:#FA7D00;margin-bottom:4px">'+d+'</div><div style="font-size:11px;font-weight:800;color:#282728">Days to<br>Closing</div></div>';
+    else if(d===0) daysHtml='<div style="flex-shrink:0;background:linear-gradient(135deg,#FA7D00,#e06000);border-radius:14px;padding:12px 14px;min-width:96px;box-shadow:0 2px 12px rgba(250,125,0,0.3);text-align:center"><div style="font-size:16px;font-weight:900;color:#fff;margin-bottom:4px">TODAY!</div><div style="font-size:11px;font-weight:800;color:rgba(255,255,255,0.8)">Closing<br>Day</div></div>';
+  }
+
+  // Winding horizontal road
+  var N=MS.length,xStep=82,yTop=46,yBot=96,yMid=68;
+  var pts=MS.map(function(_,i){return{x:70+i*xStep,y:i===0||i===N-1?yMid:i%2===1?yTop:yBot};});
+  var lastX=pts[N-1].x+70, totalW=lastX+70;
+  var d="M "+pts[0].x+","+pts[0].y;
+  for(var pi=1;pi<pts.length;pi++){var pp=pts[pi-1],pc=pts[pi],cpx=(pp.x+pc.x)/2;d+=" C "+cpx+","+pp.y+" "+cpx+","+pc.y+" "+pc.x+","+pc.y;}
+  d+=" C "+(pts[N-1].x+25)+","+pts[N-1].y+" "+(lastX-10)+","+yMid+" "+lastX+","+yMid;
+  var circles=MS.map(function(m,i){
+    var p=pts[i],done=i<mi,isCur=i===mi,r=isCur?22:15;
+    var emoji=getThemeEmoji(loan,i);
+    var fill=done?"url(#hgd)":isCur?"url(#hgc)":"#e8ecf2";
+    var stroke=isCur?"#FA7D00":done?"#38a060":"#ccc";
+    var glow=isCur?"<circle cx='"+p.x+"' cy='"+p.y+"' r='"+(r+9)+"' fill='rgba(250,125,0,0.15)'/>":"";
+    var hereTag=isCur?"<rect x='"+(p.x-18)+"' y='"+(p.y+r+2)+"' width='36' height='13' rx='6' fill='#FA7D00'/><text x='"+p.x+"' y='"+(p.y+r+11)+"' text-anchor='middle' font-family='Arial' font-size='7' font-weight='800' fill='white'>HERE</text>":"";
+    var lbl=m.s.length>9?m.s.slice(0,9)+"...":m.s;
+    var lbY=i===0||i===N-1?p.y+r+18:i%2===1?p.y-r-10:p.y+r+(isCur?24:18);
+    var lbColor=isCur?"#FA7D00":done?"#64C887":"rgba(255,255,255,0.45)";
+    return glow+"<circle cx='"+p.x+"' cy='"+p.y+"' r='"+r+"' fill='"+fill+"' stroke='"+stroke+"' stroke-width='"+(isCur?4:2.5)+"' style='cursor:pointer' data-a='tS' data-i='"+i+"'/>"
+      +"<text x='"+p.x+"' y='"+(p.y+1)+"' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='"+(isCur?13:10)+"' fill='"+(done||isCur?"#fff":"#aaa")+"' pointer-events='none'>"+(done?"✓":emoji)+"</text>"
+      +hereTag
+      +"<text x='"+p.x+"' y='"+lbY+"' text-anchor='middle' font-family='Arial' font-size='8' font-weight='"+(isCur?800:done?600:400)+"' fill='"+lbColor+"' pointer-events='none'>"+lbl+"</text>";
+  }).join("");
+  var svgRoad="<svg viewBox='0 0 "+totalW+" 155' width='"+totalW+"' height='155' xmlns='http://www.w3.org/2000/svg' style='display:block;overflow:visible'>"
+    +"<defs><linearGradient id='hgd' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='#64C887'/><stop offset='100%' stop-color='#38c46e'/></linearGradient>"
+    +"<linearGradient id='hgc' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='#003057'/><stop offset='100%' stop-color='#00488a'/></linearGradient></defs>"
+    +"<path d='"+d+"' stroke='rgba(0,0,0,0.25)' stroke-width='24' fill='none' stroke-linecap='round' stroke-linejoin='round'/>"
+    +"<path d='"+d+"' stroke='#cdc0ae' stroke-width='20' fill='none' stroke-linecap='round' stroke-linejoin='round'/>"
+    +"<path d='"+d+"' stroke='rgba(255,255,255,0.7)' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round' stroke-dasharray='12 10'/>"
+    +circles
+    +"<circle cx='"+lastX+"' cy='"+yMid+"' r='44' fill='rgba(100,200,135,0.18)'/>"
+    +"<circle cx='"+lastX+"' cy='"+yMid+"' r='32' fill='url(#hgd)' stroke='#38a060' stroke-width='3'/>"
+    +"<text x='"+lastX+"' y='"+(yMid+2)+"' text-anchor='middle' dominant-baseline='middle' font-size='22' pointer-events='none'>🏠</text>"
+    +"<text x='"+lastX+"' y='"+(yMid+50)+"' text-anchor='middle' font-family='Arial' font-size='9' font-weight='800' fill='#64C887' pointer-events='none'>CLOSED!</text>"
+    +"</svg>";
+
+  // LO email card
+  var loCard="";
+  if(lo){
+    var avatar=lo.photo?'<img src="'+lo.photo+'" alt="'+esc(lo.name)+'" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #e8ecf2" onerror="this.style.display=\'none\'">':'<div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#003057,#007DC3);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;flex-shrink:0">'+lo.name.split(" ").map(function(w){return w[0];}).slice(0,2).join("")+'</div>';
+    var emailBtn=lo.email?'<a href="mailto:'+lo.email+'?subject=Re: '+esc(loan.lastName)+' Loan" style="background:linear-gradient(135deg,#003057,#00488a);color:#fff;border-radius:10px;padding:9px 12px;font-weight:800;font-size:12px;text-decoration:none;white-space:nowrap">✉ Email LO</a>':"";
+    loCard='<div style="margin:0 16px 16px;background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,0.05)">'
+      +'<div style="font-size:10px;font-weight:700;color:#9aa3b0;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">Your Team</div>'
+      +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">'+avatar
+      +'<div style="flex:1"><div style="font-weight:800;font-size:15px;color:#003057">'+esc(lo.name)+'</div>'
+      +'<div style="font-size:11px;color:#9aa3b0">Loan Officer'+(lo.nmls&&lo.nmls!=="TBD"?" · NMLS# "+lo.nmls:"")+'</div></div>'+emailBtn+'</div>'
+      +'<div style="border-top:1px solid #f0f0f0;padding-top:12px;display:flex;align-items:center;gap:12px">'
+      +'<div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#64C887,#38c46e);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚙️</div>'
+      +'<div style="flex:1"><div style="font-weight:800;font-size:15px;color:#003057">Processing Team</div><div style="font-size:11px;color:#9aa3b0">Alex Zimmer & Glenda Weygant</div></div>'
+      +'<a href="mailto:alex.zimmer@mottomortgage.com,glenda.weygant@mottomortgage.com?subject=Re: '+esc(loan.lastName)+' Loan" style="background:linear-gradient(135deg,#64C887,#38c46e);color:#fff;border-radius:10px;padding:9px 12px;font-weight:800;font-size:12px;text-decoration:none;white-space:nowrap">✉ Email Team</a>'
+      +'</div></div>';
+  }
+
+  var pendingAlert="";
+  if(pendingCnt>0){
+    pendingAlert='<div class="urgent-alert" style="margin:12px 16px 0;border-radius:18px;padding:16px 18px;cursor:pointer" data-a="sBTab" data-t="map">'
+      +'<div style="display:flex;align-items:center;gap:12px">'
+      +'<div style="width:46px;height:46px;border-radius:50%;background:rgba(200,0,0,0.08);border:2.5px solid #cc0000;display:flex;align-items:center;justify-content:center;flex-shrink:0">'
+      +'<div style="font-size:20px;font-weight:900;color:#cc0000">'+pendingCnt+'</div></div>'
+      +'<div style="flex:1;min-width:0"><div style="color:#cc0000;font-weight:900;font-size:15px;margin-bottom:2px">'+pendingCnt+' Item'+(pendingCnt!==1?"s":"")+" Need Your Attention!"+'</div>'
+      +'<div style="color:#aa0000;font-size:12px;font-weight:600">PDF only — tap to view your checklist</div></div>'
+      +'<div style="width:32px;height:32px;border-radius:50%;background:rgba(200,0,0,0.08);border:1px solid rgba(200,0,0,0.4);display:flex;align-items:center;justify-content:center">'
+      +'<div style="color:#cc0000;font-size:18px;font-weight:700">›</div></div></div></div>';
+  }
+
+  return '<div style="background:#f4f6fa;min-height:calc(100vh - 130px)">'
+    // Hero
+    +'<div style="background:linear-gradient(160deg,#003057 0%,#00366b 50%,#004a8a 100%);position:relative;overflow:hidden;padding:18px 0 0">'
+    +'<div style="padding:0 20px 12px">'
+    +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+    +'<span style="background:'+statusColor+';color:'+(isCtc||isClosed?"#fff":"#003057")+';font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;letter-spacing:0.06em">'+stepEmoji+' '+esc(cur.s)+'</span>'
+    +'<span style="background:rgba(255,255,255,0.15);color:#fff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px">'+prog+'% Complete</span></div>'
+    +'<div style="color:#fff;font-weight:900;font-size:22px;line-height:1.2;margin-bottom:2px">'+(isClosed?"Congratulations!":"Welcome, ")+'<span style="color:'+(isCtc?"#FA7D00":"#64C887")+'">'+esc(loan.lastName)+' Family</span>'+(isClosed?"":"!")+'</div>'
+    +'<div style="color:rgba(255,255,255,0.6);font-size:12px">'+esc(loan.address||"Your Home Awaits")+(loan.mlsNumber?" &nbsp;·&nbsp; MLS# "+esc(loan.mlsNumber):"")+'</div></div>'
+    // Winding road
+    +'<div style="overflow-x:auto;padding:0 16px 18px;scrollbar-width:none;-webkit-overflow-scrolling:touch">'+svgRoad+'</div>'
+    +'</div>'
+    // Stats
+    +'<div style="display:flex;gap:10px;padding:14px 16px 0;overflow-x:auto;scrollbar-width:none">'
+    +'<div style="flex-shrink:0;background:#fff;border-radius:14px;padding:12px 14px;min-width:96px;box-shadow:0 2px 12px rgba(0,0,0,0.07);text-align:center"><div style="font-size:22px;margin-bottom:4px">'+stepEmoji+'</div><div style="font-size:11px;font-weight:800;color:#282728;line-height:1.3">'+esc(cur.s)+'</div><div style="font-size:10px;color:#9aa3b0;margin-top:2px">Current Step</div></div>'
+    +'<div style="flex-shrink:0;background:#fff;border-radius:14px;padding:12px 14px;min-width:96px;box-shadow:0 2px 12px rgba(0,0,0,0.07);text-align:center"><div style="font-size:22px;font-weight:900;color:'+(pendingCnt>0?"#cc0000":"#64C887")+';margin-bottom:4px">'+(pendingCnt>0?pendingCnt:"✓")+'</div><div style="font-size:11px;font-weight:800;color:#282728;line-height:1.3">'+(pendingCnt>0?"Docs Needed":"All Clear")+'</div><div style="font-size:10px;color:#9aa3b0;margin-top:2px">'+(pendingCnt>0?"Action required":"Great work!")+'</div></div>'
+    +daysHtml
+    +'<div style="flex-shrink:0;background:linear-gradient(135deg,#003057,#00488a);border-radius:14px;padding:12px 14px;min-width:96px;box-shadow:0 2px 12px rgba(0,48,87,0.25);text-align:center"><div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:4px">'+(mi+1)+'<span style="font-size:12px;opacity:0.6">/'+MS.length+'</span></div><div style="font-size:11px;font-weight:800;color:#A4BCC2">Steps Done</div><div style="background:rgba(255,255,255,0.15);border-radius:6px;height:4px;margin-top:6px;overflow:hidden"><div style="background:#FA7D00;height:100%;border-radius:6px;width:'+prog+'%"></div></div></div>'
+    +'</div>'
+    +pendingAlert
+    +(isCtc?'<div style="margin:12px 16px 0;background:linear-gradient(135deg,#64C887,#00B894);border-radius:16px;padding:14px 16px;box-shadow:0 4px 18px rgba(100,200,135,0.3)"><div style="color:#fff;font-weight:900;font-size:15px;margin-bottom:3px">🎉 CLEAR TO CLOSE!</div><div style="color:rgba(255,255,255,0.85);font-size:13px">Every condition is satisfied. Closing time!</div></div>':"")
+    // Nav cards
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px">'
+    +[{id:"map",g:"linear-gradient(135deg,#003057,#007DC3)",t:"Your Roadmap",s:"Step "+(mi+1)+" of "+MS.length},
+      {id:"faq",g:"linear-gradient(135deg,#FA7D00,#FF6B00)",t:"FAQ",s:"Get answers fast"},
+      {id:"postclose",g:"linear-gradient(135deg,#64C887,#00B894)",t:"After Closing",s:"What to do next"},
+      {id:"contact",g:"linear-gradient(135deg,#282728,#4a4a58)",t:"Contact Us",s:"Your team is here"}
+    ].map(function(c){return '<button data-a="sBTab" data-t="'+c.id+'" style="background:'+c.g+';border:none;border-radius:16px;padding:16px 14px;text-align:left;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.12);min-height:90px;font-family:Arial,sans-serif;width:100%"><div style="color:rgba(255,255,255,0.6);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">Tap</div><div style="color:#fff;font-weight:900;font-size:14px;line-height:1.3">'+c.t+'</div><div style="color:rgba(255,255,255,0.7);font-size:11px;margin-top:2px">'+c.s+'</div></button>';}).join("")
+    +'</div>'
+    +loCard
+    +'</div>';
+}
+
+// ── Borrower View ─────────────────────────────────────────────────────────────
+function buildBorrowerView(loan){
+  var icons={
+    home:'<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>',
+    map:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="10" r="3"/><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/></svg>',
+    faq:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9 9a3 3 0 0 1 6 0c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12" y2="17"/></svg>',
+    contact:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 17v3a2 2 0 0 1-2 2A20 20 0 0 1 3 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2c.1 1 .4 2 .7 3a2 2 0 0 1-.4 2L9 10a16 16 0 0 0 5 5l1-1a2 2 0 0 1 2-.4c1 .3 2 .6 3 .7a2 2 0 0 1 2 2z"/></svg>'
+  };
+  var labels={home:"Home",map:"Roadmap",faq:"FAQ",contact:"Contact"};
+  var bnav='<div class="bnav">'+["home","map","faq","contact"].map(function(k){
+    var active=ST.bTab===k?" active":"";
+    var col=ST.bTab===k?"#FA7D00":"#9aa3b0";
+    var ico=icons[k].replace(/currentColor/g,col);
+    return '<button class="bnav-btn'+active+'" data-a="sBTab" data-t="'+k+'"><span style="width:20px;height:20px">'+ico+'</span>'+labels[k]+'</button>';
+  }).join("")+"</div>";
+  var content="";
+  if(ST.bTab==="home") content=buildBorrowerHome(loan);
+  else if(ST.bTab==="map") content=buildRoadMap(loan);
+  else if(ST.bTab==="faq") content=buildFAQ();
+  else if(ST.bTab==="postclose") content=buildPostClose();
+  else if(ST.bTab==="contact") content=buildContactPage(false,loan);
+  return '<div style="display:flex;flex-direction:column;min-height:calc(100vh - 66px)">'+content+'</div>'+bnav;
+}
+
+// ── Road Map (vertical SVG winding) ───────────────────────────────────────────
+function buildRoadMap(loan){
+  var mi=mIdx(loan.milestone);
+  var cur=findMs(loan.milestone);
+  var prog=Math.round((mi/(MS.length-1))*100);
+  var W=320,LX=62,RX=258,RH=90,SY=45;
+  var pos=MS.map(function(_,i){return{x:i%2===0?LX:RX,y:SY+i*RH,side:i%2===0?"left":"right"};});
+  var H=SY+15*RH+60;
+  var rp="M "+pos[0].x+" "+pos[0].y;
+  for(var ri=1;ri<pos.length;ri++){var pp=pos[ri-1],pc=pos[ri],my=(pp.y+pc.y)/2;rp+=" C "+pp.x+","+my+" "+pc.x+","+my+" "+pc.x+","+pc.y;}
+  rp+=" C "+pos[pos.length-1].x+","+(H-50)+" "+(W/2)+","+(H-30)+" "+(W/2)+","+(H-10);
+  var circles=MS.map(function(m,i){
+    var p=pos[i],done=i<mi,isCur=i===mi;
+    var r=isCur?34:26;
+    var emoji=getThemeEmoji(loan,i);
+    var fill=done?"url(#vgd)":isCur?"url(#vgc)":"#e8ecf2";
+    var stroke=isCur?"#FA7D00":done?"#38a060":"#d0d6e0";
+    var sw=isCur?5:3;
+    var glow=isCur?"<circle cx='"+p.x+"' cy='"+p.y+"' r='"+(r+10)+"' fill='rgba(250,125,0,0.12)'/>":done?"<circle cx='"+p.x+"' cy='"+p.y+"' r='"+(r+5)+"' fill='rgba(100,200,135,0.12)'/>":"";
+    var badge=isCur?"<rect x='"+(p.x-30)+"' y='"+(p.y+r+3)+"' width='60' height='16' rx='8' fill='url(#vgo)'/><text x='"+p.x+"' y='"+(p.y+r+13)+"' text-anchor='middle' font-family='Arial' font-size='8' font-weight='800' fill='white' letter-spacing='0.5'>YOU ARE HERE</text>":"";
+    var isLeft=p.side==="left";
+    var lx=isLeft?p.x+r+10:p.x-r-10;
+    var anchor=isLeft?"start":"end";
+    var fw=isCur?900:done?700:500;
+    var fc=isCur?"#003057":done?"#282728":"#aaa";
+    return glow+"<circle cx='"+p.x+"' cy='"+p.y+"' r='"+r+"' fill='"+fill+"' stroke='"+stroke+"' stroke-width='"+sw+"' style='cursor:pointer' data-a='tS' data-i='"+i+"'/>"
+      +"<text x='"+p.x+"' y='"+(p.y+1)+"' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='"+(done?18:isCur?20:16)+"' pointer-events='none' fill='"+(done||isCur?"#fff":"#9aa3b0")+"'>"+(done?"✓":emoji)+"</text>"
+      +badge
+      +"<text x='"+lx+"' y='"+(p.y-6)+"' text-anchor='"+anchor+"' font-family='Arial' font-size='"+(isCur?14:12)+"' font-weight='"+fw+"' fill='"+fc+"' pointer-events='none'>"+esc(m.s)+"</text>"
+      +(done?"<text x='"+lx+"' y='"+(p.y+10)+"' text-anchor='"+anchor+"' font-family='Arial' font-size='11' font-weight='700' fill='#38a060' pointer-events='none'>Done ✓</text>":"");
+  }).join("");
+  return '<div style="padding:14px 12px;background:#f4f6fa;min-height:calc(100vh - 130px)">'
+    +'<div class="card" style="padding:16px 10px">'
+    +'<div style="text-align:center;margin-bottom:8px"><div style="font-weight:900;font-size:20px;color:#003057;margin-bottom:3px">Your Road to Home</div><div style="font-size:13px;color:#9aa3b0">Tap any stop for details</div></div>'
+    +'<svg viewBox="0 0 '+W+' '+H+'" width="100%" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">'
+    +'<defs><linearGradient id="vgd" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#64C887"/><stop offset="100%" stop-color="#38c46e"/></linearGradient>'
+    +'<linearGradient id="vgc" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#003057"/><stop offset="100%" stop-color="#00488a"/></linearGradient>'
+    +'<linearGradient id="vgo" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FA7D00"/><stop offset="100%" stop-color="#e06000"/></linearGradient></defs>'
+    +'<path d="'+rp+'" stroke="rgba(0,0,0,0.12)" stroke-width="46" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+    +'<path d="'+rp+'" stroke="#d4c8b8" stroke-width="42" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+    +'<path d="'+rp+'" stroke="rgba(255,255,255,0.7)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="18 13"/>'
+    +circles
+    +'<circle cx="'+(W/2)+'" cy="'+(H-10)+'" r="26" fill="url(#vgd)" stroke="#38a060" stroke-width="3"/>'
+    +'<text x="'+(W/2)+'" y="'+(H-10)+'" text-anchor="middle" dominant-baseline="middle" font-size="20" pointer-events="none">🏠</text>'
+    +'<text x="'+(W/2)+'" y="'+(H+18)+'" text-anchor="middle" font-family="Arial" font-size="13" font-weight="900" fill="#003057" pointer-events="none">Your New Home!</text>'
+    +'</svg></div></div>';
+}
+
+// ── Toggle Step Modal ─────────────────────────────────────────────────────────
+function toggleStep(i){
+  var loan=ST.session&&ST.session.loanId?ST.loans.find(function(l){return l.id===ST.session.loanId;}):null;
+  var mi2=loan?mIdx(loan.milestone):0;
+  var m=MS[i];
+  var done=i<mi2,isCur=i===mi2;
+  var emoji=loan?getThemeEmoji(loan,i):m.e;
+  var badge=isCur?'<div style="background:linear-gradient(135deg,#FA7D00,#e06000);color:#fff;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:800;display:inline-block;margin-bottom:12px">YOU ARE HERE</div>':done?'<div style="color:#38a060;font-weight:700;font-size:13px;margin-bottom:12px">Complete ✓</div>':"";
+  var modal=document.getElementById("modal");
+  modal.innerHTML='<div class="modal-overlay" data-a="cM-overlay"><div class="modal-box" style="text-align:center">'
+    +'<div style="font-size:50px;margin-bottom:10px">'+emoji+'</div>'
+    +'<div style="font-weight:900;font-size:20px;color:'+(isCur?"#FA7D00":done?"#38a060":"#003057")+';margin-bottom:6px">'+esc(m.s)+'</div>'
+    +badge
+    +'<div style="font-size:14px;line-height:1.85;color:#444;text-align:left;margin-bottom:18px">'+esc(m.detail)+'</div>'
+    +'<button data-a="cM" class="btn btn-orange">Got it</button></div></div>';
+  modal.style.display="block";
+}
+
+// ── Contact Page ──────────────────────────────────────────────────────────────
+function buildContactPage(standalone,loan){
+  var officeHtml=OFFICES.map(function(o){
+    return '<div class="card" style="margin-bottom:10px">'
+      +'<div style="font-size:11px;font-weight:700;color:#FA7D00;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">'+(o.name==="Fort Myers"?"Fort Myers Office":"Naples Office")+'</div>'
+      +'<div style="font-weight:800;font-size:14px;color:#003057;margin-bottom:4px">Motto Mortgage Infinity</div>'
+      +'<div style="font-size:13px;color:#666;margin-bottom:2px">'+o.address+'</div>'
+      +'<div style="font-size:13px;color:#666;margin-bottom:8px">'+o.city+'</div>'
+      +'<a href="tel:'+o.phone.replace(/\D/g,"")+'" style="color:#007DC3;font-weight:800;font-size:15px;text-decoration:none">'+o.phone+'</a>'
+      +'<div style="font-size:11px;color:#aaa;margin-top:4px">NMLS# '+o.nmls+'</div></div>';
+  }).join("");
+  var teamHtml=LOS.map(function(l){
+    var initials=l.name.split(" ").map(function(w){return w[0];}).slice(0,2).join("");
+    var avatar=l.photo?'<img src="'+l.photo+'" alt="'+esc(l.name)+'" style="width:64px;height:64px;border-radius:50%;object-fit:cover;flex-shrink:0;border:3px solid #e8ecf2;box-shadow:0 2px 8px rgba(0,0,0,0.12)" onerror="this.style.display=\'none\'">'
+      :'<div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#003057,#007DC3);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;flex-shrink:0">'+initials+'</div>';
+    return '<div style="display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid #f0f0f0">'+avatar
+      +'<div style="flex:1"><div style="font-weight:800;font-size:16px;color:#282728">'+esc(l.name)+'</div>'
+      +'<div style="font-size:12px;color:#888;margin-bottom:3px">'+esc(l.title)+(l.nmls&&l.nmls!=="TBD"?" | NMLS# "+l.nmls:"")+'</div>'
+      +'<div style="font-size:11px;color:#aaa;margin-bottom:5px">📍 4048 Evans Ave, Suite 303 · Fort Myers, FL 33901</div>'
+      +(l.phone?'<a href="tel:'+l.phone.replace(/\D/g,"")+'" style="color:#007DC3;font-weight:700;font-size:14px;text-decoration:none">'+l.phone+'</a>':"")
+      +(l.email?'<div style="font-size:12px;color:#888;margin-top:2px">'+esc(l.email)+'</div>':"")
+      +'</div></div>';
+  }).join("");
+  return '<div style="padding:14px 16px;background:#f4f6fa;min-height:calc(100vh - 130px)">'
+    +(standalone?'<div style="background:linear-gradient(135deg,#003057,#00488a);border-radius:14px;padding:18px 16px;margin-bottom:14px"><div style="color:#FA7D00;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">Contact</div><div style="color:#fff;font-weight:900;font-size:22px">Our Offices</div></div>':"")
+    +'<div class="card" style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:#FA7D00;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Our Licensed Loan Originators</div>'+teamHtml+'</div>'
+    +officeHtml
+    +'<div style="margin-top:10px;text-align:center;padding:12px;background:rgba(0,48,87,0.05);border-radius:12px;font-size:11px;color:#888;line-height:1.6">'
+    +'<svg width="20" height="20" viewBox="0 0 24 24" fill="#003057" style="vertical-align:middle;margin-right:4px"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>'
+    +'Equal Housing Opportunity<br>Each Office is Independently Owned, Operated, and Licensed.</div>'
+    +'</div>';
+}
+
+// ── FAQ ───────────────────────────────────────────────────────────────────────
+function buildFAQ(){
+  var cats=[
+    {t:"The Mortgage Process",qs:[
+      ["What are the steps in the mortgage process?","Application → Submission to Lender → Conditional Approval → Appraisal (Ordered, Paid, Received) → Title (Ordered, Received) → Insurance (Quoted, Bound) → Conditions Clearing → CD Sent → CD Signed → Clear to Close → Closing Scheduled → Closed. Each step is tracked on your roadmap."],
+      ["How long does the process take?","A typical purchase mortgage takes 30-45 days from application to closing. We keep things moving — respond quickly to all document requests to avoid delays."],
+      ["What happens after I submit my application?","We review your file, order your credit report, and submit your loan to the lender. You'll receive a document checklist within 1-2 business days."],
+    ]},
+    {t:"Qualifying",qs:[
+      ["What credit score do I need?","Conventional loans typically require 620+. FHA loans can go as low as 580. VA and USDA loans have flexible requirements. We shop multiple lenders to find the best fit for your situation."],
+      ["How much down payment do I need?","FHA: 3.5% down. Conventional: as low as 3-5%. VA and USDA: 0% down for qualified buyers. Down payment assistance programs may be available in your area."],
+      ["What is a debt-to-income ratio?","Your DTI is your monthly debt payments divided by your gross monthly income. Most lenders prefer 43% or below. We'll calculate yours during the application process."],
+    ]},
+    {t:"Your Documents",qs:[
+      ["What documents do I need?","ALL documents must be submitted in PDF format — clear, legible, ALL pages. No screenshots accepted. Required: Driver's License, Social Security Card, W-2s (last 2 years), Pay Stubs (1 full month), Bank Statements (last 2 months, ALL pages, ALL accounts), Federal Tax Returns (last 2 years, ALL schedules). Self-employed: add Business License, Business Returns, P&L Statement."],
+      ["Why PDF only?","Lenders require PDFs for all documents. Screenshots are blurry, miss pages, and will be rejected — causing delays. Always download the official PDF from your bank or employer portal."],
+      ["How do I submit documents?","Your loan officer will provide a secure upload link. You can also email documents directly to your loan officer."],
+    ]},
+    {t:"Understanding Costs",qs:[
+      ["What are closing costs?","Closing costs typically run 2-5% of the loan amount and include lender fees, title insurance, appraisal, prepaid interest, homeowners insurance, and property taxes. You'll receive a detailed Loan Estimate at application and a Closing Disclosure at least 3 days before closing."],
+      ["What is an appraisal?","An independent appraisal confirms the home's market value. The fee (typically $400-$600) is usually paid upfront. Lenders require it to ensure the home is worth the loan amount."],
+      ["What is title insurance?","Title insurance protects you from past ownership claims, liens, or legal issues with the property. It's a one-time premium paid at closing."],
+    ]},
+    {t:"5 Tips for a Smooth Closing",qs:[
+      ["Don't make any large deposits or withdrawals","All unusual bank activity must be explained in writing. Keep your financial activity normal throughout the entire loan process."],
+      ["Don't make any major purchases","No new cars, furniture, or appliances on credit until after closing. New debt can change your debt-to-income ratio and jeopardize your loan."],
+      ["Don't change jobs during the process","Employment changes must be disclosed immediately. A job change can affect your qualifying income."],
+      ["Respond quickly to all requests","Every day of delay costs you time and potentially money. Respond to requests within 24 hours."],
+      ["Don't apply for new credit","Each new credit inquiry can lower your score and affect your loan terms. Wait until after closing."],
+    ]},
+  ];
+  var html='<div style="padding:14px 16px;background:#f4f6fa;min-height:calc(100vh - 130px)">'
+    +'<div style="background:linear-gradient(135deg,#003057,#00488a);border-radius:14px;padding:20px 16px;margin-bottom:14px">'
+    +'<div style="color:#FA7D00;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">Knowledge Base</div>'
+    +'<div style="color:#fff;font-weight:900;font-size:22px;margin-bottom:4px">Mortgage FAQ</div>'
+    +'<div style="color:#A4BCC2;font-size:13px">Tap any question to expand the answer</div></div>';
+  cats.forEach(function(cat,ci){
+    html+='<div class="card" style="margin-bottom:12px">'
+      +'<div style="font-weight:900;font-size:13px;color:#FA7D00;text-transform:uppercase;letter-spacing:0.1em;padding-bottom:8px;border-bottom:2px solid #FA7D00;margin-bottom:4px">'+cat.t+'</div>';
+    cat.qs.forEach(function(q,qi){
+      var qid="fa"+ci+"_"+qi;
+      html+='<div class="faq-q" onclick="toggleFaq('+ci+','+qi+')"><span>'+q[0]+'</span><span id="ft'+ci+'_'+qi+'" style="color:#FA7D00;font-size:18px;font-weight:300;flex-shrink:0">+</span></div>'
+        +'<div class="faq-ans" id="'+qid+'">'+q[1]+'</div>';
+    });
+    html+='</div>';
+  });
+  return html+'</div>';
+}
+function toggleFaq(ci,qi){
+  var ans=document.getElementById("fa"+ci+"_"+qi);
+  var tog=document.getElementById("ft"+ci+"_"+qi);
+  if(!ans)return;
+  var showing=ans.classList.contains("show");
+  document.querySelectorAll(".faq-ans").forEach(function(el){el.classList.remove("show");});
+  document.querySelectorAll("[id^='ft']").forEach(function(el){if(el)el.textContent="+";});
+  if(!showing){ans.classList.add("show");if(tog)tog.textContent="−";}
+}
+
+// ── Post Close ────────────────────────────────────────────────────────────────
+function buildPostClose(){
+  return '<div style="padding:14px 16px;background:#f4f6fa;min-height:calc(100vh - 130px)">'
+    +'<div style="background:linear-gradient(135deg,#64C887,#38c46e);border-radius:14px;padding:20px 16px;margin-bottom:14px">'
+    +'<div style="color:rgba(255,255,255,0.7);font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">After Closing</div>'
+    +'<div style="color:#fff;font-weight:900;font-size:22px;margin-bottom:4px">🏠 Welcome Home!</div>'
+    +'<div style="color:rgba(255,255,255,0.85);font-size:13px">Important steps for new homeowners</div></div>'
+    +'<div class="card" style="margin-bottom:12px"><div style="font-weight:800;font-size:15px;color:#003057;margin-bottom:8px">💳 First Payment</div><div style="font-size:14px;line-height:1.75;color:#555">Your first mortgage payment is typically due on the 1st of the SECOND month after closing. Example: If you close in January, your first payment is due March 1st. You will receive a welcome letter from your lender with payment instructions.</div></div>'
+    +'<div class="card" style="margin-bottom:12px"><div style="font-weight:800;font-size:15px;color:#003057;margin-bottom:8px">📬 Mortgage Transfer</div><div style="font-size:14px;line-height:1.75;color:#555">Your loan may be sold to another servicer — this is normal and your loan terms do not change. Watch for a notice in the mail. Continue making payments to your original servicer until you receive confirmation of the transfer.</div></div>'
+    +'<div class="card" style="margin-bottom:12px"><div style="font-weight:800;font-size:15px;color:#003057;margin-bottom:8px">🏦 Escrow Account</div><div style="font-size:14px;line-height:1.75;color:#555">If your loan includes an escrow account, your monthly payment covers principal, interest, property taxes, and homeowners insurance. Your servicer pays your taxes and insurance from this account.</div></div>'
+    +'<div class="card" style="margin-bottom:12px;border:2px solid #FA7D00"><div style="font-weight:800;font-size:15px;color:#FA7D00;margin-bottom:8px">⭐ Florida Homestead Exemption</div><div style="font-size:14px;line-height:1.75;color:#555">Apply by <strong>March 1st</strong> to save hundreds per year on property taxes! Visit your county property appraiser website:<br><br><a href="https://www.leepa.org" target="_blank" style="color:#007DC3;font-weight:700">leepa.org</a> (Lee County)<br><a href="https://www.collierappraiser.com" target="_blank" style="color:#007DC3;font-weight:700">collierappraiser.com</a> (Collier County)<br><a href="https://www.charlottecountypa.gov" target="_blank" style="color:#007DC3;font-weight:700">charlottecountypa.gov</a> (Charlotte County)</div></div>'
+    +'<div class="card" style="margin-bottom:12px"><div style="font-weight:800;font-size:15px;color:#cc0000;margin-bottom:8px">⚠ Beware of Solicitations</div><div style="font-size:14px;line-height:1.75;color:#555">After closing, your information becomes public record. You may receive mail or calls offering mortgage protection insurance, refinancing, or other services. Be cautious — contact us before making any changes to your mortgage.</div></div>'
+    +'</div>';
+}
+
+// ── Staff Dashboard ───────────────────────────────────────────────────────────
+function buildStaffDash(){
+  var user=ST.session.staffUser;
+  var isAdmin=user.role==="admin";
+  var loans=isAdmin?ST.loans:ST.loans.filter(function(l){return l.loNmls===user.nmls;});
+  var html='<div style="padding:14px 16px;background:#f4f6fa;min-height:100vh">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+    +'<div><div style="font-weight:900;font-size:20px;color:#003057">Loan Files</div><div style="font-size:12px;color:#888">'+loans.length+' file'+(loans.length!==1?"s":"")+(isAdmin?"":" assigned to you")+'</div></div>'
+    +'<button class="btn btn-orange" style="width:auto;padding:10px 16px;font-size:13px" data-a="newLoan">+ New File</button></div>';
+  if(loans.length===0){
+    html+='<div class="card" style="text-align:center;padding:32px"><div style="font-size:36px;margin-bottom:10px">📋</div><div style="font-weight:700;color:#666">No loan files yet</div><div style="font-size:13px;color:#aaa;margin-top:4px">Click + New File to get started</div></div>';
+  } else {
+    loans.forEach(function(loan){
+      var mi=mIdx(loan.milestone);
+      var cur=findMs(loan.milestone);
+      var prog=Math.round((mi/(MS.length-1))*100);
+      var lo=findLO(loan.loNmls);
+      var pendingCnt=BSTD.filter(function(c){return !(loan.bConds&&loan.bConds[c.id]);}).length+(loan.custB||[]).filter(function(c){return !c.checked;}).length;
+      html+='<div class="loan-card" data-a="openLoan" data-id="'+loan.id+'">'
+        +'<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px">'
+        +'<div><div style="font-weight:800;font-size:16px;color:#003057">'+esc(loan.lastName)+' Family</div>'
+        +'<div style="font-size:12px;color:#888">'+esc(loan.address||"No address set")+'</div>'
+        +(lo?'<div style="font-size:11px;color:#aaa">LO: '+esc(lo.name)+'</div>':"")+'</div>'
+        +'<div style="text-align:right"><div style="background:linear-gradient(135deg,#64C887,#38c46e);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:8px;margin-bottom:4px">'+prog+'%</div>'
+        +(pendingCnt>0?'<div style="background:#fff0f0;color:#cc0000;font-size:10px;font-weight:700;padding:3px 8px;border-radius:8px">'+pendingCnt+' pending</div>':"")+'</div></div>'
+        +'<div style="display:flex;align-items:center;gap:8px">'
+        +'<span style="background:#e8f4ff;color:#003057;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px">'+getThemeEmoji(loan,mi)+' '+esc(cur.s)+'</span>'
+        +(loan.closingDate?'<span style="background:#f0f0f0;color:#666;font-size:11px;padding:3px 8px;border-radius:6px">Close: '+esc(loan.closingDate)+'</span>':"")
+        +'</div></div>';
+    });
+  }
+  return html+'</div>';
+}
+
+// ── Loan Editor ───────────────────────────────────────────────────────────────
+function buildEditor(loan){
+  var tabs=[["info","📋 Info"],["logins","🔑 Logins"],["borrower","👤 Borrower"],["realtor","🤝 Realtor"],["notes","📝 Notes"]];
+  var tabHtml='<div class="sec-tabs">'+tabs.map(function(t){return '<button class="sec-tab'+(ST.editTab===t[0]?" active":"")+'" data-a="sETab" data-t="'+t[0]+'">'+t[1]+'</button>';}).join("")+'</div>';
+  var msOpts=MS.map(function(m){return '<option value="'+m.id+'"'+(loan.milestone===m.id?" selected":"")+'>'+m.s+'</option>';}).join("");
+  var loOpts=LOS.filter(function(l){return l.nmls&&l.nmls!=="TBD";}).map(function(l){return '<option value="'+l.nmls+'"'+(loan.loNmls===l.nmls?" selected":"")+'>'+esc(l.name)+' (NMLS# '+l.nmls+')</option>';}).join("");
+  var body="";
+  if(ST.editTab==="info"){
+    body='<div style="background:#e8f4ff;border:1.5px solid #007DC3;border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:14px;font-weight:700;color:#003057">📍 Fort Myers — NMLS# 1865732</div>'
+      +'<label class="lbl">Loan Officer</label><select class="inp" data-field="loNmls"><option value="">-- Select LO --</option>'+loOpts+'</select>'
+      +'<label class="lbl">Borrower Last Name</label><input class="inp" type="text" value="'+esc(loan.lastName)+'" placeholder="e.g. Johnson" data-field="lastName">'
+      +'<label class="lbl">Property Address</label><input class="inp" type="text" value="'+esc(loan.address)+'" placeholder="123 Main St, Fort Myers, FL" data-field="address">'
+      +'<label class="lbl">Closing Date</label><input class="inp" type="date" value="'+esc(loan.closingDate)+'" data-field="closingDate">'
+      +'<label class="lbl">MLS Number</label><input class="inp" type="text" value="'+esc(loan.mlsNumber||"")+'" placeholder="e.g. 2024001234" data-field="mlsNumber">'
+      +'<label class="lbl">Borrower Phone</label><input class="inp" type="tel" value="'+esc(loan.borrowerPhone)+'" placeholder="(239) 555-1234" data-field="borrowerPhone">'
+      +'<label class="lbl">Borrower Email</label><input class="inp" type="email" value="'+esc(loan.borrowerEmail)+'" placeholder="email@example.com" data-field="borrowerEmail">'
+      +'<label class="lbl">Current Milestone</label><select class="inp" data-field="milestone">'+msOpts+'</select>'
+      +'<div style="background:#e8f4ff;border:1.5px solid #007DC3;border-radius:10px;padding:10px 14px;margin-top:14px;margin-bottom:4px;font-size:12px;color:#004a8a;font-weight:700">🤝 Realtor Information</div>'
+      +'<label class="lbl">Listing Agent Name <span style="color:#9aa3b0;font-weight:400">(Seller\'s Agent)</span></label><input class="inp" type="text" value="'+esc(loan.listingAgentName||"")+'" placeholder="e.g. Mary Johnson" data-field="listingAgentName">'
+      +'<label class="lbl">Listing Agent Phone</label><input class="inp" type="tel" value="'+esc(loan.listingAgentPhone||"")+'" placeholder="(239) 555-5678" data-field="listingAgentPhone">'
+      +'<label class="lbl" style="margin-top:10px">Buyer\'s Agent Name <span style="color:#9aa3b0;font-weight:400">(Your Client\'s Agent)</span></label><input class="inp" type="text" value="'+esc(loan.buyerAgentName||"")+'" placeholder="e.g. John Smith" data-field="buyerAgentName">'
+      +'<label class="lbl">Buyer\'s Agent Phone</label><input class="inp" type="tel" value="'+esc(loan.buyerAgentPhone||"")+'" placeholder="(239) 555-1234" data-field="buyerAgentPhone">';
+  } else if(ST.editTab==="logins"){
+    body='<div style="background:#fff7e6;border:1.5px solid #FA7D00;border-radius:10px;padding:12px;margin-bottom:14px;font-size:13px;color:#7a4000">Set login credentials for the borrower and realtor portals.</div>'
+      +'<label class="lbl">Borrower Username</label><input class="inp" type="text" value="'+esc(loan.borrowerUser)+'" placeholder="e.g. smithfamily" data-field="borrowerUser">'
+      +'<label class="lbl">Borrower Password</label><input class="inp" type="text" value="'+esc(loan.borrowerPass)+'" placeholder="e.g. closing2024" data-field="borrowerPass">'
+      +'<label class="lbl" style="margin-top:14px">Realtor Username</label><input class="inp" type="text" value="'+esc(loan.realtorUser)+'" placeholder="e.g. maryj_realtor" data-field="realtorUser">'
+      +'<label class="lbl">Realtor Password</label><input class="inp" type="text" value="'+esc(loan.realtorPass)+'" placeholder="e.g. realtor2024" data-field="realtorPass">';
+  } else if(ST.editTab==="borrower"){
+    var bCondsHtml=BSTD.map(function(c){return '<div class="cond-row"><input type="checkbox" id="bc_'+c.id+'" '+(loan.bConds&&loan.bConds[c.id]?"checked":"")+' data-a="bCond" data-id="'+c.id+'" style="width:18px;height:18px;cursor:pointer"><label for="bc_'+c.id+'" style="flex:1;cursor:pointer">'+esc(c.l)+'</label></div>';}).join("");
+    var custBHtml=(loan.custB||[]).map(function(c,i){return '<div class="cond-row"><input type="checkbox" id="cbc_'+i+'" '+(c.checked?"checked":"")+' data-a="cbCond" data-i="'+i+'" style="width:18px;height:18px;cursor:pointer"><label for="cbc_'+i+'" style="flex:1;cursor:pointer">'+esc(c.l)+'</label><button data-a="delCB" data-i="'+i+'" style="background:none;border:none;color:#cc0000;cursor:pointer;font-size:16px">×</button></div>';}).join("");
+    body='<div style="font-weight:700;font-size:14px;color:#003057;margin-bottom:10px">Document Checklist</div>'+bCondsHtml
+      +(custBHtml?'<div style="margin-top:8px">'+custBHtml+'</div>':"")
+      +'<div style="display:flex;gap:8px;margin-top:10px"><input class="inp" id="newCB" type="text" placeholder="Add custom item..." style="flex:1"><button class="btn btn-navy" style="width:auto;padding:10px 14px" data-a="addCB">Add</button></div>'
+      +'<label class="lbl" style="margin-top:16px">Message to Borrower</label><textarea class="inp" data-field="bNote" placeholder="Optional message shown on their home screen...">'+esc(loan.bNote)+'</textarea>';
+  } else if(ST.editTab==="realtor"){
+    var rCondsHtml=RSTD.map(function(c){return '<div class="cond-row"><input type="checkbox" id="rc_'+c.id+'" '+(loan.rConds&&loan.rConds[c.id]?"checked":"")+' data-a="rCond" data-id="'+c.id+'" style="width:18px;height:18px;cursor:pointer"><label for="rc_'+c.id+'" style="flex:1;cursor:pointer">'+esc(c.l)+'</label></div>';}).join("");
+    var custRHtml=(loan.custR||[]).map(function(c,i){return '<div class="cond-row"><input type="checkbox" id="ccr_'+i+'" '+(c.checked?"checked":"")+' data-a="crCond" data-i="'+i+'" style="width:18px;height:18px;cursor:pointer"><label for="ccr_'+i+'" style="flex:1;cursor:pointer">'+esc(c.l)+'</label><button data-a="delCR" data-i="'+i+'" style="background:none;border:none;color:#cc0000;cursor:pointer;font-size:16px">×</button></div>';}).join("");
+    body='<div style="font-weight:700;font-size:14px;color:#003057;margin-bottom:10px">Realtor Checklist</div>'+rCondsHtml
+      +(custRHtml?'<div style="margin-top:8px">'+custRHtml+'</div>':"")
+      +'<div style="display:flex;gap:8px;margin-top:10px"><input class="inp" id="newCR" type="text" placeholder="Add custom item..." style="flex:1"><button class="btn btn-navy" style="width:auto;padding:10px 14px" data-a="addCR">Add</button></div>'
+      +'<label class="lbl" style="margin-top:16px">Message to Realtor</label><textarea class="inp" data-field="rNote" placeholder="Optional message for the realtor portal...">'+esc(loan.rNote)+'</textarea>';
+  } else if(ST.editTab==="notes"){
+    body='<label class="lbl">Internal Notes (Staff Only)</label><textarea class="inp" style="min-height:200px" data-field="notes" placeholder="Internal notes not visible to borrower or realtor...">'+esc(loan.notes)+'</textarea>';
+  }
+  return '<div style="padding:14px 16px;background:#f4f6fa;min-height:100vh">'
+    +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">'
+    +'<button data-a="backDash" style="background:none;border:none;color:#666;font-size:13px;cursor:pointer;font-family:Arial,sans-serif;padding:0">&lsaquo; Dashboard</button>'
+    +'<div style="flex:1"><div style="font-weight:900;font-size:18px;color:#003057">'+(loan.lastName?esc(loan.lastName)+" Family":"New Loan File")+'</div>'
+    +'<div style="font-size:12px;color:#888">'+esc(loan.address||"No address")+'</div></div>'
+    +'<button class="btn btn-orange" style="width:auto;padding:10px 16px;font-size:13px" data-a="saveLoan">Save</button></div>'
+    +tabHtml+'<div class="card">'+body+'</div></div>';
+}
+
+// ── Realtor View ──────────────────────────────────────────────────────────────
+function buildRealtorView(){
+  var user=ST.session;
+  var loans=ST.loans.filter(function(l){return l.realtorUser&&l.realtorUser===user.username;});
+  if(!ST.realtorSelId&&loans.length>0) ST.realtorSelId=loans[0].id;
+  var loan=loans.find(function(l){return l.id===ST.realtorSelId;})||null;
+  if(loans.length===0){
+    return '<div style="padding:20px"><div class="card" style="text-align:center;padding:32px"><div style="font-size:36px;margin-bottom:10px">🤝</div><div style="font-weight:700;color:#666">No files found</div><div style="font-size:13px;color:#aaa;margin-top:4px">Contact your loan officer to be added to a file.</div></div></div>';
+  }
+  var fileList='<div style="margin-bottom:14px;overflow-x:auto;scrollbar-width:none;display:flex;gap:8px;padding:0 16px">'
+    +loans.map(function(l){return '<button data-a="selR" data-id="'+l.id+'" style="background:'+(ST.realtorSelId===l.id?"linear-gradient(135deg,#003057,#00488a)":"#fff")+';color:'+(ST.realtorSelId===l.id?"#fff":"#003057")+';border:2px solid '+(ST.realtorSelId===l.id?"transparent":"#e2e8f0")+';border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:Arial,sans-serif">'+esc(l.lastName)+' Family</button>';}).join("")+'</div>';
+  if(!loan) return '<div style="padding:14px 16px">'+fileList+'</div>';
+  var mi=mIdx(loan.milestone);
+  var cur=findMs(loan.milestone);
+  var prog=Math.round((mi/(MS.length-1))*100);
+  var rPending=RSTD.filter(function(c){return !(loan.rConds&&loan.rConds[c.id]);}).length+(loan.custR||[]).filter(function(c){return !c.checked;}).length;
+  var rDone=RSTD.filter(function(c){return loan.rConds&&loan.rConds[c.id];}).length+(loan.custR||[]).filter(function(c){return c.checked;}).length;
+  var rTotal=RSTD.length+(loan.custR||[]).length;
+  return '<div style="padding:14px 0;background:#f4f6fa;min-height:100vh">'
+    +fileList
+    +'<div style="padding:0 16px">'
+    +'<div style="background:linear-gradient(135deg,#64C887,#38c46e);border-radius:18px;padding:18px;margin-bottom:12px;box-shadow:0 4px 20px rgba(100,200,135,0.3)">'
+    +'<div style="color:rgba(255,255,255,0.7);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:6px">Current Status</div>'
+    +'<div style="color:#fff;font-weight:900;font-size:22px;margin-bottom:4px">'+esc(loan.lastName)+' Family</div>'
+    +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+    +'<span style="background:rgba(255,255,255,0.25);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px">'+getThemeEmoji(loan,mi)+' '+esc(cur.s)+'</span>'
+    +'<span style="background:rgba(255,255,255,0.2);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px">'+prog+'% Complete</span></div>'
+    +'<div style="background:rgba(255,255,255,0.15);border-radius:8px;height:8px;overflow:hidden"><div style="background:#fff;height:100%;border-radius:8px;width:'+prog+'%"></div></div>'
+    +(loan.rNote?'<div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:10px;margin-top:10px;color:#fff;font-size:13px;font-weight:600">💬 '+esc(loan.rNote)+'</div>':"")
+    +'</div>'
+    +(rPending>0?'<div class="card" style="border:2px solid #cc0000;margin-bottom:12px"><div style="font-weight:800;font-size:15px;color:#cc0000;margin-bottom:8px">⚠ '+rPending+' Item'+(rPending!==1?"s":"")+" Needed"+'</div>'+RSTD.filter(function(c){return !(loan.rConds&&loan.rConds[c.id]);}).map(function(c){return '<div class="pending-item"><span style="color:#FA7D00;font-size:16px">●</span>'+esc(c.l)+'</div>';}).join("")+(loan.custR||[]).filter(function(c){return !c.checked;}).map(function(c){return '<div class="pending-item"><span style="color:#FA7D00;font-size:16px">●</span>'+esc(c.l)+'</div>';}).join("")+'</div>':"")
+    +'<div class="card"><div style="font-weight:700;font-size:14px;color:#003057;margin-bottom:10px">Checklist Progress ('+rDone+'/'+rTotal+')</div>'
+    +RSTD.map(function(c){var done=loan.rConds&&loan.rConds[c.id];return '<div class="cond-row"><span style="color:'+(done?"#38a060":"#d0d6e0")+';font-size:20px;flex-shrink:0">'+(done?"✓":"○")+'</span><span style="color:'+(done?"#282728":"#9aa3b0")+'">'+esc(c.l)+'</span></div>';}).join("")
+    +(loan.custR||[]).map(function(c){return '<div class="cond-row"><span style="color:'+(c.checked?"#38a060":"#d0d6e0")+';font-size:20px;flex-shrink:0">'+(c.checked?"✓":"○")+'</span><span style="color:'+(c.checked?"#282728":"#9aa3b0")+'">'+esc(c.l)+'</span></div>';}).join("")
+    +'</div>'
+    +(loan.closingDate?'<div class="card" style="text-align:center"><div style="font-size:11px;font-weight:700;color:#9aa3b0;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Estimated Closing</div><div style="font-weight:900;font-size:24px;color:#003057">'+esc(loan.closingDate)+'</div></div>':"")
+    +'</div></div>';
+}
+
+// ── Render & Navigation ───────────────────────────────────────────────────────
+function buildBorrowerChecklist(loan){
+  var pending=[...BSTD.filter(function(c){return !(loan.bConds&&loan.bConds[c.id]);}),
+               ...(loan.custB||[]).filter(function(c){return !c.checked;})];
+  return '<div style="padding:14px 16px;background:#f4f6fa;min-height:calc(100vh - 130px)">'
+    +'<div class="card" style="border:2.5px solid #cc0000;box-shadow:0 0 18px rgba(200,0,0,0.18)">'
+    +'<div style="font-weight:900;font-size:16px;color:#cc0000;margin-bottom:8px">⚠ Action Required</div>'
+    +'<div style="color:#666;font-size:13px;margin-bottom:10px;line-height:1.5">Please provide the following — <strong>PDF format only</strong>, no screenshots, all pages included.</div>'
+    +pending.map(function(c){return '<div class="pending-item"><span style="color:#FA7D00;font-size:16px;flex-shrink:0">●</span>'+esc(c.l||c.label)+'</div>';}).join("")
+    +'</div></div>';
+}
+
+function renderModal(){
+  var modal=document.getElementById("modal");
+  if(ST.smsPrompt){
+    var p=ST.smsPrompt;
+    modal.innerHTML='<div class="modal-overlay" data-a="cM-overlay"><div class="modal-box">'
+      +'<div style="font-size:28px;text-align:center;margin-bottom:10px">📱</div>'
+      +'<div style="font-weight:800;font-size:16px;color:#003057;margin-bottom:4px;text-align:center">Send Update to Borrower?</div>'
+      +'<div style="font-size:13px;color:#666;margin-bottom:12px;text-align:center">Tap to open your Messages app</div>'
+      +'<div style="background:#f4f6fa;border-radius:10px;padding:12px;font-size:13px;line-height:1.75;color:#444;margin-bottom:16px">'+esc(p.text)+'</div>'
+      +(p.phone?'<a href="sms:'+p.phone+'?body='+encodeURIComponent(p.text)+'" class="btn btn-green" style="display:block;text-align:center;text-decoration:none;padding:14px;margin-bottom:8px">📲 Open Messages</a>':"")
+      +'<button data-a="cM" class="btn" style="background:#e8ecf2;color:#666">Dismiss</button>'
+      +'</div></div>';
+    modal.style.display="block";
+  } else {
+    modal.style.display="none";
+    modal.innerHTML="";
+  }
+}
+
+function renderMain(){
+  var main=document.getElementById("main");
+  var v=ST.view;
+  if(v.endsWith("-login")){
+    main.innerHTML=buildLogin(v.replace("-login",""));
+  } else if(v==="contact"){
+    main.innerHTML=buildContactPage(true,null);
+  } else if(v==="borrower"){
+    var loan=ST.loans.find(function(l){return l.id===ST.session.loanId;});
+    if(loan){
+      if(ST.bTab==="map"&&!ST.session.showChecklist) main.innerHTML=buildBorrowerView(loan);
+      else if(ST.session.showChecklist){main.innerHTML=buildBorrowerChecklist(loan);}
+      else main.innerHTML=buildBorrowerView(loan);
+    }
+  } else if(v==="realtor"){
+    main.innerHTML=buildRealtorView();
+  } else if(v==="staff"){
+    if(ST.staffView==="dash") main.innerHTML=buildStaffDash();
+    else if(ST.staffView==="edit"&&ST.editLoan) main.innerHTML=buildEditor(ST.editLoan);
+  }
+  renderModal();
+}
+
+function render(){
+  document.getElementById("hdr").innerHTML=buildHeader();
+  if(ST.view!=="landing") renderMain();
+  document.getElementById("ftr").innerHTML=buildFooter();
+}
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+function doLogin(type){
+  var u=(document.getElementById("li_u")||{}).value||"";
+  var p=(document.getElementById("li_p")||{}).value||"";
+  var err=document.getElementById("li_err");
+  if(type==="staff"){
+    var su=STAFF.find(function(s){return s.u===u&&s.p===p;});
+    if(su){ST.session={type:"staff",staffUser:su};ST.view="staff";ST.staffView="dash";render();}
+    else{if(err)err.style.display="block";}
+  } else if(type==="borrower"){
+    var loan=ST.loans.find(function(l){return l.borrowerUser===u&&l.borrowerPass===p;});
+    if(loan){ST.session={type:"borrower",loanId:loan.id,username:u};ST.bTab="home";ST.view="borrower";render();}
+    else{if(err)err.style.display="block";}
+  } else if(type==="realtor"){
+    var rl=ST.loans.find(function(l){return l.realtorUser===u&&l.realtorPass===p;});
+    if(rl){ST.session={type:"realtor",username:u};ST.view="realtor";render();}
+    else{if(err)err.style.display="block";}
+  }
+}
+function goLanding(){ST.session=null;ST.view="landing";ST.bTab="home";ST.realtorSelId=null;ST.editLoan=null;ST.staffView="dash";ST.smsPrompt=null;showLandingStatic();render();}
+function doLogout(){goLanding();}
+function setBTab(t){ST.bTab=t;ST.session.showChecklist=false;renderMain();}
+function setRealtorSel(id){ST.realtorSelId=id;renderMain();}
+function showApp(p){document.getElementById("static-land").style.display="none";document.getElementById("main").style.display="block";ST.view=p+"-login";render();}
+function showLandingStatic(){document.getElementById("static-land").style.display="block";document.getElementById("main").style.display="none";document.getElementById("main").innerHTML="";}
+function goLogin(t){ST.view=t+"-login";render();}
+
+// ── Field Updates ─────────────────────────────────────────────────────────────
+function updField(field,val){if(ST.editLoan){ST.editLoan[field]=val;}}
+
+// ── Click Handler ─────────────────────────────────────────────────────────────
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-a]");
+  if(!el) return;
+  var a=el.getAttribute("data-a");
+  switch(a){
+    case "lgOut": doLogout(); break;
+    case "goBack": showLandingStatic(); render(); break;
+    case "doLogin": doLogin(el.getAttribute("data-t")); break;
+    case "sBTab": setBTab(el.getAttribute("data-t")); break;
+    case "selR": setRealtorSel(el.getAttribute("data-id")); break;
+    case "tS": toggleStep(parseInt(el.getAttribute("data-i")||"0")); break;
+    case "cM": case "cM-overlay": ST.smsPrompt=null;renderModal(); break;
+    case "newLoan":
+      var lo=ST.session.staffUser;
+      ST.editLoan=makeLoan(lo.role==="lo"?lo.nmls:"");
+      ST.editTab="info";ST.staffView="edit";renderMain(); break;
+    case "openLoan":
+      var lid=el.getAttribute("data-id");
+      var fl=ST.loans.find(function(l){return l.id===lid;});
+      if(fl){ST.editLoan=JSON.parse(JSON.stringify(fl));ST.editTab="info";ST.staffView="edit";renderMain();}
+      break;
+    case "backDash": ST.staffView="dash";ST.editLoan=null;renderMain(); break;
+    case "sETab": ST.editTab=el.getAttribute("data-t");renderMain(); break;
+    case "saveLoan":
+      if(!ST.editLoan) break;
+      var idx=ST.loans.findIndex(function(l){return l.id===ST.editLoan.id;});
+      var smsMs=ST.editLoan.milestone;
+      var origLoan=idx>=0?ST.loans[idx]:null;
+      var msChanged=origLoan&&origLoan.milestone!==smsMs;
+      if(idx>=0) ST.loans[idx]=JSON.parse(JSON.stringify(ST.editLoan));
+      else ST.loans.unshift(JSON.parse(JSON.stringify(ST.editLoan)));
+      saveLoans();
+      if(msChanged){
+        var m=findMs(smsMs);var lo2=findLO(ST.editLoan.loNmls);
+        var smsText=m.sms+(lo2?" — "+lo2.name+(lo2.nmls&&lo2.nmls!=="TBD"?" NMLS# "+lo2.nmls:""):"");
+        ST.smsPrompt={text:smsText,phone:ST.editLoan.borrowerPhone};
+        renderModal();
+      } else {
+        ST.staffView="dash";ST.editLoan=null;renderMain();
+      }
+      break;
+    case "bCond":
+      if(ST.editLoan){var id=el.getAttribute("data-id");ST.editLoan.bConds[id]=el.checked;renderMain();}break;
+    case "rCond":
+      if(ST.editLoan){var rid=el.getAttribute("data-id");ST.editLoan.rConds[rid]=el.checked;renderMain();}break;
+    case "cbCond":
+      if(ST.editLoan){var ci2=parseInt(el.getAttribute("data-i")||"0");if(ST.editLoan.custB[ci2])ST.editLoan.custB[ci2].checked=el.checked;renderMain();}break;
+    case "crCond":
+      if(ST.editLoan){var cri=parseInt(el.getAttribute("data-i")||"0");if(ST.editLoan.custR[cri])ST.editLoan.custR[cri].checked=el.checked;renderMain();}break;
+    case "addCB":
+      if(ST.editLoan){var v=(document.getElementById("newCB")||{}).value||"";if(v.trim()){ST.editLoan.custB.push({id:genId(),l:v.trim(),checked:false});renderMain();}}break;
+    case "addCR":
+      if(ST.editLoan){var vr=(document.getElementById("newCR")||{}).value||"";if(vr.trim()){ST.editLoan.custR.push({id:genId(),l:vr.trim(),checked:false});renderMain();}}break;
+    case "delCB":
+      if(ST.editLoan){var di=parseInt(el.getAttribute("data-i")||"0");ST.editLoan.custB.splice(di,1);renderMain();}break;
+    case "delCR":
+      if(ST.editLoan){var dri=parseInt(el.getAttribute("data-i")||"0");ST.editLoan.custR.splice(dri,1);renderMain();}break;
+  }
+});
+
+// ── Input change handler ──────────────────────────────────────────────────────
+document.addEventListener("input",function(e){
+  var el=e.target.closest("[data-field]");
+  if(el&&ST.editLoan){
+    var field=el.getAttribute("data-field");
+    ST.editLoan[field]=el.value;
+  }
+});
+document.addEventListener("keydown",function(e){
+  if(e.key==="Enter"&&ST.view.endsWith("-login")){doLogin(ST.view.replace("-login",""));}
+});
+
+// ── Portal buttons ────────────────────────────────────────────────────────────
+document.getElementById("go-borrower").addEventListener("click",function(){showApp("borrower");});
+document.getElementById("go-realtor").addEventListener("click",function(){showApp("realtor");});
+document.getElementById("go-staff").addEventListener("click",function(){showApp("staff");});
+document.getElementById("go-contact").addEventListener("click",function(){
+  document.getElementById("static-land").style.display="none";
+  document.getElementById("main").style.display="block";
+  ST.view="contact";renderMain();
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+try{loadLoans();render();}catch(err){
+  document.body.innerHTML='<div style="padding:30px;font-family:Arial;background:#0c1a2e;min-height:100vh;color:#fff"><div style="background:#FA7D00;border-radius:12px;padding:16px;margin-bottom:16px;font-weight:700">App Error — please report to developer:</div><pre style="background:rgba(255,255,255,0.1);padding:16px;border-radius:8px;font-size:12px;white-space:pre-wrap">'+err.stack+'</pre></div>';
+}
+</script>
+</body>
+</html>
