@@ -728,7 +728,10 @@ function buildStaffDash(){
 
 // ── Loan Editor ───────────────────────────────────────────────────────────────
 function buildEditor(loan){
-  var tabs=[["info","📋 Info"],["logins","🔑 Logins"],["borrower","👤 Borrower"],["realtor","🤝 Realtor"],["notes","📝 Notes"]];
+  var isAdminEditor=ST.session&&ST.session.staffUser&&ST.session.staffUser.role==="admin";
+  var tabs=[["info","📋 Info"],["logins","🔑 Logins"]];
+  if(isAdminEditor) tabs.push(["borrower","👤 Borrower"]);
+  tabs.push(["realtor","🤝 Realtor"],["notes","📝 Notes"]);
   var tabHtml='<div class="sec-tabs">'+tabs.map(function(t){return '<button class="sec-tab'+(ST.editTab===t[0]?" active":"")+'" data-a="sETab" data-t="'+t[0]+'">'+t[1]+'</button>';}).join("")+'</div>';
   var msOpts=MS.map(function(m){return '<option value="'+m.id+'"'+(loan.milestone===m.id?" selected":"")+'>'+m.s+'</option>';}).join("");
   var loOpts=LOS.filter(function(l){return l.nmls&&l.nmls!=="TBD";}).map(function(l){return '<option value="'+l.nmls+'"'+(loan.loNmls===l.nmls?" selected":"")+'>'+esc(l.name)+' (NMLS# '+l.nmls+')</option>';}).join("");
@@ -755,12 +758,14 @@ function buildEditor(loan){
       +'<label class="lbl" style="margin-top:14px">Realtor Username</label><input class="inp" type="text" value="'+esc(loan.realtorUser)+'" placeholder="e.g. maryj_realtor" data-field="realtorUser">'
       +'<label class="lbl">Realtor Password</label><input class="inp" type="text" value="'+esc(loan.realtorPass)+'" placeholder="e.g. realtor2024" data-field="realtorPass">';
   } else if(ST.editTab==="borrower"){
+    if(!isAdminEditor){body='<div style="padding:20px;text-align:center;color:#cc0000;font-weight:700">Admin access only.</div>';} else {
     var bCondsHtml=BSTD.map(function(c){return '<div class="cond-row"><input type="checkbox" id="bc_'+c.id+'" '+(loan.bConds&&loan.bConds[c.id]?"checked":"")+' data-a="bCond" data-id="'+c.id+'" style="width:18px;height:18px;cursor:pointer"><label for="bc_'+c.id+'" style="flex:1;cursor:pointer">'+esc(c.l)+'</label></div>';}).join("");
     var custBHtml=(loan.custB||[]).map(function(c,i){return '<div class="cond-row"><input type="checkbox" id="cbc_'+i+'" '+(c.checked?"checked":"")+' data-a="cbCond" data-i="'+i+'" style="width:18px;height:18px;cursor:pointer"><label for="cbc_'+i+'" style="flex:1;cursor:pointer">'+esc(c.l)+'</label><button data-a="delCB" data-i="'+i+'" style="background:none;border:none;color:#cc0000;cursor:pointer;font-size:16px">×</button></div>';}).join("");
     body='<div style="font-weight:700;font-size:14px;color:#003057;margin-bottom:10px">Document Checklist</div>'+bCondsHtml
       +(custBHtml?'<div style="margin-top:8px">'+custBHtml+'</div>':"")
       +'<div style="display:flex;gap:8px;margin-top:10px"><input class="inp" id="newCB" type="text" placeholder="Add custom item..." style="flex:1"><button class="btn btn-navy" style="width:auto;padding:10px 14px" data-a="addCB">Add</button></div>'
       +'<label class="lbl" style="margin-top:16px">Message to Borrower</label><textarea class="inp" data-field="bNote" placeholder="Optional message shown on their home screen...">'+esc(loan.bNote)+'</textarea>';
+    }
   } else if(ST.editTab==="realtor"){
     var rCondsHtml=RSTD.map(function(c){return '<div class="cond-row"><input type="checkbox" id="rc_'+c.id+'" '+(loan.rConds&&loan.rConds[c.id]?"checked":"")+' data-a="rCond" data-id="'+c.id+'" style="width:18px;height:18px;cursor:pointer"><label for="rc_'+c.id+'" style="flex:1;cursor:pointer">'+esc(c.l)+'</label></div>';}).join("");
     var custRHtml=(loan.custR||[]).map(function(c,i){return '<div class="cond-row"><input type="checkbox" id="ccr_'+i+'" '+(c.checked?"checked":"")+' data-a="crCond" data-i="'+i+'" style="width:18px;height:18px;cursor:pointer"><label for="ccr_'+i+'" style="flex:1;cursor:pointer">'+esc(c.l)+'</label><button data-a="delCR" data-i="'+i+'" style="background:none;border:none;color:#cc0000;cursor:pointer;font-size:16px">×</button></div>';}).join("");
@@ -978,6 +983,7 @@ document.addEventListener("click",function(e){
       if(fl){ST.editLoan=JSON.parse(JSON.stringify(fl));ST.editTab="info";ST.staffView="edit";renderMain();}
       break;
     case "backDash": ST.staffView="dash";ST.editLoan=null;renderMain(); break;
+    case "sETab": ST.editTab=el.getAttribute("data-t");renderMain(); break;
     case "delLoan":
       e.stopPropagation();
       var delId=el.getAttribute("data-id");
@@ -1047,8 +1053,4 @@ document.getElementById("go-contact").addEventListener("click",function(){
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 try{loadLoans();render();}catch(err){
-  document.body.innerHTML='<div style="padding:30px;font-family:Arial;background:#0c1a2e;min-height:100vh;color:#fff"><div style="background:#FA7D00;border-radius:12px;padding:16px;margin-bottom:16px;font-weight:700">App Error — please report to developer:</div><pre style="background:rgba(255,255,255,0.1);padding:16px;border-radius:8px;font-size:12px;white-space:pre-wrap">'+err.stack+'</pre></div>';
-}
-</script>
-</body>
-</html>
+  document.body.innerHTML='<div style="padding:30px;font-family:Arial;back
