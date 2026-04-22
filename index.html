@@ -11,6 +11,19 @@ body{font-family:Arial,Helvetica,sans-serif;background:#f4f6fa;color:#282728;min
 /* Header */
 .hdr{background:linear-gradient(135deg,#003057 0%,#003f72 100%);position:sticky;top:0;z-index:50;border-bottom:3px solid #FA7D00}
 .hdr-inner{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;max-width:600px;margin:0 auto;width:100%}
+.hamburger-btn{background:none;border:none;cursor:pointer;padding:6px;display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.hamburger-btn span{display:block;width:24px;height:2.5px;background:#fff;border-radius:2px;transition:all 0.2s}
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;display:none}
+.drawer-overlay.open{display:block}
+.drawer{position:fixed;top:0;right:-280px;width:280px;height:100%;background:#fff;z-index:301;transition:right 0.25s ease;box-shadow:-4px 0 24px rgba(0,0,0,0.15);overflow-y:auto}
+.drawer.open{right:0}
+.drawer-header{background:linear-gradient(135deg,#003057,#00488a);padding:20px 16px;display:flex;align-items:center;justify-content:space-between}
+.drawer-close{background:none;border:none;color:#fff;font-size:24px;cursor:pointer;line-height:1}
+.drawer-item{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid #f0f0f0;cursor:pointer;font-family:Arial,sans-serif;text-decoration:none;width:100%;background:none;border-left:none;border-right:none;border-top:none;text-align:left}
+.drawer-item:hover{background:#f8fafc}
+.drawer-item-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.drawer-item-text{font-weight:700;font-size:14px;color:#003057}
+.drawer-item-sub{font-size:11px;color:#9aa3b0;margin-top:2px}
 .logo-btn{background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:0}
 .hdr-user{display:flex;align-items:center;gap:8px}
 .hdr-label{color:rgba(255,255,255,0.7);font-size:12px;font-weight:600}
@@ -313,8 +326,18 @@ function buildHeader(){
     else if(ST.session.type==="borrower") label="Borrower Portal";
     else if(ST.session.type==="realtor") label="Realtor Portal";
   }
-  const userHtml=label?'<div class="hdr-user"><div class="hdr-label">'+label+'</div><button class="logout-btn" data-a="lgOut">Logout</button></div>':"";
-  return '<div class="hdr"><div class="hdr-inner"><button class="logo-btn" data-a="lgOut">'+buildMottoLogo()+'<div style="border-left:1px solid rgba(255,255,255,0.18);padding-left:10px"><div style="color:#fff;font-weight:900;font-size:15px;letter-spacing:0.22em">INFINITY</div></div></button>'+userHtml+'</div></div>';
+  var accountItem=ST.session?'<button class="drawer-item" data-a="drawerAccount"><div class="drawer-item-icon" style="background:#e8f4ff">👤</div><div><div class="drawer-item-text">Account</div><div class="drawer-item-sub">'+label+'</div></div></button>':"";
+  var faqItem='<button class="drawer-item" data-a="drawerFaq"><div class="drawer-item-icon" style="background:#fff7e6">❓</div><div><div class="drawer-item-text">FAQ</div><div class="drawer-item-sub">Mortgage knowledge base</div></div></button>';
+  var drawerHtml='<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>'
+    +'<div class="drawer" id="drawer">'
+    +'<div class="drawer-header"><div style="color:#fff;font-weight:900;font-size:16px">Menu</div><button class="drawer-close" onclick="closeDrawer()">×</button></div>'
+    +accountItem
+    +faqItem
+    +'<button class="drawer-item" data-a="drawerContact"><div class="drawer-item-icon" style="background:#e8f4ff">📍</div><div><div class="drawer-item-text">Contact Us</div><div class="drawer-item-sub">Offices, team & website</div></div></button>'
+    +(ST.session?'<div style="padding:20px 16px;border-top:1px solid #f0f0f0;margin-top:8px"><button class="btn btn-navy" data-a="lgOut" style="font-size:13px;padding:12px">Logout</button></div>':"")
+    +'</div>';
+  var hamburger='<button class="hamburger-btn" onclick="openDrawer()"><span></span><span></span><span></span></button>';
+  return '<div class="hdr"><div class="hdr-inner"><button class="logo-btn" data-a="lgOut">'+buildMottoLogo()+'<div style="border-left:1px solid rgba(255,255,255,0.18);padding-left:10px"><div style="color:#fff;font-weight:900;font-size:15px;letter-spacing:0.22em">INFINITY</div></div></button>'+hamburger+'</div></div>'+drawerHtml;
 }
 
 // ── Footer ─────────────────────────────────────────────────────────────────────
@@ -436,11 +459,8 @@ function buildBorrowerHome(loan){
     // Hero
     +'<div style="background:linear-gradient(160deg,#003057 0%,#00366b 50%,#004a8a 100%);position:relative;overflow:hidden;padding:18px 0 0">'
     +'<div style="padding:0 20px 12px">'
-    +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
-    +'<span style="background:'+statusColor+';color:'+(isCtc||isClosed?"#fff":"#003057")+';font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;letter-spacing:0.06em">'+stepEmoji+' '+esc(cur.s)+'</span>'
-    +'<span style="background:rgba(255,255,255,0.15);color:#fff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px">'+prog+'% Complete</span></div>'
-    +'<div style="color:#fff;font-weight:900;font-size:22px;line-height:1.2;margin-bottom:2px">'+(isClosed?"Congratulations!":"Welcome, ")+'<span style="color:'+(isCtc?"#FA7D00":"#64C887")+'">'+esc(loan.lastName)+' Family</span>'+(isClosed?"":"!")+'</div>'
-    +'<div style="color:rgba(255,255,255,0.6);font-size:12px">'+esc(loan.address||"Your Home Awaits")+(loan.mlsNumber?" &nbsp;·&nbsp; MLS# "+esc(loan.mlsNumber):"")+'</div></div>'
+    +'<div style="color:#fff;font-weight:900;font-size:22px;line-height:1.2;margin-bottom:2px">'+(isClosed?"Congratulations, ":"Welcome, ")+'<span style="color:'+(isCtc?"#FA7D00":"#64C887")+'">'+esc(loan.lastName)+' Family</span>'+(isClosed?"!":"!")+'</div>'
+    +'<div style="color:rgba(255,255,255,0.6);font-size:12px">'+esc(loan.address||"Your Home Awaits")+'</div></div>'
     // Winding road
     +'<div style="overflow-x:auto;padding:10px 16px 18px;scrollbar-width:none;-webkit-overflow-scrolling:touch">'+svgRoad+'</div>'
     +'</div>'
@@ -577,7 +597,6 @@ function buildContactPage(standalone,loan){
     return '<div style="display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid #f0f0f0">'+avatar
       +'<div style="flex:1"><div style="font-weight:800;font-size:16px;color:#282728">'+esc(l.name)+'</div>'
       +'<div style="font-size:12px;color:#888;margin-bottom:3px">'+esc(l.title)+(l.nmls&&l.nmls!=="TBD"?" | NMLS# "+l.nmls:"")+'</div>'
-      +'<div style="font-size:11px;color:#aaa;margin-bottom:5px">📍 4048 Evans Ave, Suite 303 · Fort Myers, FL 33901</div>'
       +(l.phone?'<a href="tel:'+l.phone.replace(/\D/g,"")+'" style="color:#007DC3;font-weight:700;font-size:14px;text-decoration:none">'+l.phone+'</a>':"")
       +(l.email?'<div style="font-size:12px;color:#888;margin-top:2px">'+esc(l.email)+'</div>':"")
       +'</div></div>';
@@ -586,6 +605,7 @@ function buildContactPage(standalone,loan){
     +(standalone?'<div style="background:linear-gradient(135deg,#003057,#00488a);border-radius:14px;padding:18px 16px;margin-bottom:14px"><div style="color:#FA7D00;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px">Contact</div><div style="color:#fff;font-weight:900;font-size:22px">Our Offices</div></div>':"")
     +'<div class="card" style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:#FA7D00;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Our Licensed Loan Originators</div>'+teamHtml+'</div>'
     +officeHtml
+    +'<div class="card" style="margin-bottom:10px;text-align:center"><div style="font-size:11px;font-weight:700;color:#FA7D00;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px">🌐 Visit Our Website</div><a href="https://www.mottomortgageinfinity.com" target="_blank" style="color:#007DC3;font-weight:800;font-size:15px;text-decoration:none">www.mottomortgageinfinity.com</a></div>'
     +'<div style="margin-top:10px;text-align:center;padding:12px;background:rgba(0,48,87,0.05);border-radius:12px;font-size:11px;color:#888;line-height:1.6">'
     +'<svg width="20" height="20" viewBox="0 0 24 24" fill="#003057" style="vertical-align:middle;margin-right:4px"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>'
     +'Equal Housing Opportunity<br>Each Office is Independently Owned, Operated, and Licensed.</div>'
@@ -908,6 +928,8 @@ function renderMain(){
     main.innerHTML=buildLogin(v.replace("-login",""));
   } else if(v==="contact"){
     main.innerHTML=buildContactPage(true,null);
+  } else if(v==="faq-standalone"){
+    main.innerHTML=buildFAQ();
   } else if(v==="borrower"){
     var loan=ST.loans.find(function(l){return l.id===ST.session.loanId;});
     if(loan){
@@ -957,6 +979,19 @@ function showApp(p){document.getElementById("static-land").style.display="none";
 function showLandingStatic(){document.getElementById("static-land").style.display="block";document.getElementById("main").style.display="none";document.getElementById("main").innerHTML="";}
 function goLogin(t){ST.view=t+"-login";render();}
 
+function openDrawer(){
+  var d=document.getElementById("drawer");
+  var o=document.getElementById("drawerOverlay");
+  if(d){d.classList.add("open");}
+  if(o){o.classList.add("open");}
+}
+function closeDrawer(){
+  var d=document.getElementById("drawer");
+  var o=document.getElementById("drawerOverlay");
+  if(d){d.classList.remove("open");}
+  if(o){o.classList.remove("open");}
+}
+
 // ── Field Updates ─────────────────────────────────────────────────────────────
 function updField(field,val){if(ST.editLoan){ST.editLoan[field]=val;}}
 
@@ -967,6 +1002,9 @@ document.addEventListener("click",function(e){
   var a=el.getAttribute("data-a");
   switch(a){
     case "lgOut": doLogout(); break;
+    case "drawerFaq": closeDrawer(); if(ST.session&&ST.session.type==="borrower"){ST.bTab="faq";renderMain();}else{ST.view="contact";document.getElementById("static-land").style.display="none";document.getElementById("main").style.display="block";ST.view="faq-standalone";renderMain();} break;
+    case "drawerContact": closeDrawer(); if(ST.session&&ST.session.type==="borrower"){ST.bTab="contact";renderMain();}else{ST.view="contact";document.getElementById("static-land").style.display="none";document.getElementById("main").style.display="block";renderMain();} break;
+    case "drawerAccount": closeDrawer(); break;
     case "goBack": showLandingStatic(); render(); break;
     case "doLogin": doLogin(el.getAttribute("data-t")); break;
     case "sBTab": setBTab(el.getAttribute("data-t")); break;
