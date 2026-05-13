@@ -204,6 +204,32 @@ function makeLoan(loNmls){
 }
 function saveLoans(){try{localStorage.setItem("mmi_loans",JSON.stringify(ST.loans));}catch(e){}}
 function loadLoans(){try{const s=localStorage.getItem("mmi_loans");if(s)ST.loans=JSON.parse(s);}catch(e){}}
+function seedTestData(){
+  // Only seed if no Amos test loan exists (so user edits persist on refresh)
+  if(ST.loans.some(function(l){return l.borrowerUser==="amos138";})) return;
+  var seed=makeLoan("1869785"); // Andy Bravo NMLS
+  seed.lastName="Amos";
+  seed.address="123 Test Lane, Fort Myers, FL 33901";
+  seed.closingDate="07/03/2026";
+  seed.loPhone="(239) 603-8589";
+  seed.borrowerPhone="(239) 555-0142";
+  seed.borrowerEmail="test@example.com";
+  seed.listingAgentName="Jane Smith";
+  seed.listingAgentPhone="(239) 555-0101";
+  seed.buyerAgentName="Mary Johnson";
+  seed.buyerAgentPhone="(239) 555-0102";
+  seed.milestone="approval";
+  seed.borrowerUser="amos138";
+  seed.borrowerPass="MMI2026";
+  seed.realtorName="Mary Johnson";
+  seed.realtorUser="amos138";
+  seed.realtorPass="MMI2026";
+  // Mark first half of standard conditions as complete for a realistic in-progress feel
+  if(seed.bConds){var bk=Object.keys(seed.bConds);bk.slice(0,Math.floor(bk.length/2)).forEach(function(k){seed.bConds[k]=true;});}
+  if(seed.rConds){var rk=Object.keys(seed.rConds);rk.slice(0,Math.floor(rk.length/2)).forEach(function(k){seed.rConds[k]=true;});}
+  ST.loans.push(seed);
+  saveLoans();
+}
 
 // ── Landing Page ─────────────────────────────────────────────────────────────
 function buildLandingPage(){
@@ -959,6 +985,7 @@ document.addEventListener("keydown",function(e){
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 loadLoans();
+seedTestData();
 requestAnimationFrame(function(){
 try{render();}catch(err){
   document.getElementById('main').innerHTML='<div style="padding:24px;background:#0c1a2e;min-height:100vh;color:#fff"><div style="background:#FA7D00;border-radius:12px;padding:16px;margin-bottom:16px;font-weight:700;font-size:15px">⚠ App Error:</div><pre style="background:rgba(255,255,255,0.1);padding:16px;border-radius:8px;font-size:12px;white-space:pre-wrap;color:#fff">'+err.stack+'</pre></div>';
